@@ -10,21 +10,19 @@ class GraphsController < ApplicationController
 
 		# Initialize the graph
 		graph = SVG::Graph::TimeSeries.new({
-			:width => 800,
+			:area_fill => true,
 			:height => 300,
-			:graph_title => l(:label_graphs_total_vs_closed_issues),
-			:show_graph_title => true,
-			:no_css => true,
 			:key => true,
+			:no_css => true,
+			:show_x_guidelines => true,
 			:scale_x_integers => true,
 			:scale_y_integers => true,
-			:show_x_guidelines => true,
-			:stagger_x_labels => true,
-			:show_data_points => false,
+			:show_data_points => true,
 			:show_data_values => false,
-			:area_fill => true,
-			:x_label_format => "%b %d",
-			:style_sheet => "/plugin_assets/redmine_graphs/stylesheets/target_version.css"
+			:stagger_x_labels => true,
+			:style_sheet => "/plugin_assets/redmine_graphs/stylesheets/target_version.css",
+			:width => 800,
+			:x_label_format => "%b %d"
 		})
 
 		# Group issues
@@ -35,6 +33,7 @@ class GraphsController < ApplicationController
 	  	# Set the scope of the graph
 	  	scope_end_date = issues_by_updated_on.sort.keys.last
 	  	scope_end_date = @version.effective_date if !@version.effective_date.nil? && @version.effective_date > scope_end_date
+	  	scope_end_date = Date.today if !@version.completed?
 	  	line_end_date = Date.today
 	  	line_end_date = scope_end_date if scope_end_date < line_end_date
 	  		  	
@@ -45,7 +44,7 @@ class GraphsController < ApplicationController
 	  	created_on_line[scope_end_date.to_s] = created_count
 	  	graph.add_data({
 			:data => created_on_line.sort.flatten,
-			:title => l(:label_issue_plural)
+			:title => l(:label_total).capitalize
 	    })
 	    
 		# Generate the closed_on line
@@ -55,8 +54,15 @@ class GraphsController < ApplicationController
 	  	closed_on_line[line_end_date.to_s] = closed_count
 	    graph.add_data({
 			:data => closed_on_line.sort.flatten,
-			:title => "#{l(:label_issue_plural)} #{l(:label_closed_issues)}"
+			:title => l(:label_closed_issues).capitalize
 	    })
+	    
+	    # Add the version due date marker
+	    graph.add_data({
+			:data => [@version.effective_date.to_s, created_count],
+			:title => l(:field_due_date).capitalize
+	    }) unless @version.effective_date.nil?
+	    
 	    
 	    # Compile the graph
 		headers["Content-Type"] = "image/svg+xml"
