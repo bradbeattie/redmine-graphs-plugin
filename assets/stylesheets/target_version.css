@@ -1,0 +1,6 @@
+.fill1, .key1 { fill: #666666 !important; }
+.line1 { stroke: #666666 !important; }
+
+.fill2, .key2 { fill: #BAE0BA !important; }
+.fill2 { fill-opacity: 0.9 !important; }
+.line2 { stroke: #009900 !important; }
