@@ -1,3 +1,5 @@
+#target_version_graph { clear: both; }
+
 .fill1 { fill: #666 !important; }
 .line1 { stroke: #666 !important; }
 .key1, .dataPoint1 { fill: #666 !important; }

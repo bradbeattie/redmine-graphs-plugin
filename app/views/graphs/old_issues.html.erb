@@ -3,17 +3,31 @@
 <%= tag("embed", :width => "100%", :height => 300, :type => "image/svg+xml", :src => url_for(:controller => 'graphs', :action => 'issue_age_graph', :project_id => @project.id)) unless @project.nil? %>
 
 <div class="splitcontentleft">
-	<div class="box">
-		<h3 class="icon22 icon-time"><%= l(:label_issues_by, :value => l(:field_created_on)) %></h3>
-		<%= render :partial => 'issues/list_simple', :locals => { :issues => @issues_by_created_on[0..9] } %>
-	</div>
+	<h3 class="icon22 icon-time"><%= l(:label_issues_by, :value => l(:field_created_on)) %></h3>
+	<%= render :partial => 'issues/list_simple', :locals => { :issues => @issues_by_created_on[0..9] } %>
+	<% if @issues_by_created_on.length > 0 %>
+		<p class="small">
+			<%
+				link_params = { :controller => :issues, :action => :index, :set_filter => 1, :sort_key => :created_on, :sort_order => :desc } 
+				link_params[:project_id] = @project unless @project.nil?
+			%>
+			<%= link_to l(:label_issue_view_all), link_params %>
+		</p>
+	<% end %>
 </div>
 
 <div class="splitcontentright">
-	<div class="box">
-		<h3 class="icon22 icon-comment"><%= l(:label_issues_by, :value => l(:field_updated_on)) %></h3>
-		<%= render :partial => 'issues/list_simple', :locals => { :issues => @issues_by_updated_on[0..9] } %>
-	</div>
+	<h3 class="icon22 icon-comment"><%= l(:label_issues_by, :value => l(:field_updated_on)) %></h3>
+	<%= render :partial => 'issues/list_simple', :locals => { :issues => @issues_by_updated_on[0..9] } %>
+	<% if @issues_by_updated_on.length > 0 %>
+		<p class="small">
+			<%
+				link_params = { :controller => :issues, :action => :index, :set_filter => 1, :sort_key => :updated_on, :sort_order => :desc } 
+				link_params[:project_id] = @project unless @project.nil?
+			%>
+			<%= link_to l(:label_issue_view_all), link_params %>
+		</p>
+	<% end %>
 </div>
 
 <% content_for :sidebar do %>
