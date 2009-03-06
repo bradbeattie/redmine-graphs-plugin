@@ -1,0 +1,7 @@
+.fill1, .key1, .dataPoint1 { fill: #666 !important; }
+.line1 { stroke: #666 !important; }
+
+.fill2, .key2 { fill: #bac9e0 !important; }
+.fill2 { fill-opacity: 0.8 !important; }
+.line2 { stroke: #003d99 !important; }
+.dataPoint2 { fill: #003d99 !important; }

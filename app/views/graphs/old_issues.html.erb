@@ -1,0 +1,21 @@
+<h2><%= l(:label_graphs_old_issues) %></h2>
+<%= tag("embed", :width => "100%", :height => 300, :type => "image/svg+xml", :src => url_for(:controller => 'graphs', :action => 'issue_age_graph')) if @project.nil? %>
+<%= tag("embed", :width => "100%", :height => 300, :type => "image/svg+xml", :src => url_for(:controller => 'graphs', :action => 'issue_age_graph', :project_id => @project.id)) unless @project.nil? %>
+
+<div class="splitcontentleft">
+	<div class="box">
+		<h3 class="icon22 icon-time"><%= l(:label_issues_by, :value => l(:field_created_on)) %></h3>
+		<%= render :partial => 'issues/list_simple', :locals => { :issues => @issues_by_created_on[0..9] } %>
+	</div>
+</div>
+
+<div class="splitcontentright">
+	<div class="box">
+		<h3 class="icon22 icon-comment"><%= l(:label_issues_by, :value => l(:field_updated_on)) %></h3>
+		<%= render :partial => 'issues/list_simple', :locals => { :issues => @issues_by_updated_on[0..9] } %>
+	</div>
+</div>
+
+<% content_for :sidebar do %>
+    <%= render :partial => 'issues/sidebar' %>
+<% end %>

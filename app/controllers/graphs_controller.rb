@@ -2,17 +2,73 @@ require 'SVG/Graph/TimeSeries'
 
 class GraphsController < ApplicationController
 
+	before_filter :find_version, :only => [:target_version_graph]
+	before_filter :find_issues, :only => [:old_issues, :issue_age_graph]
+	
+	helper IssuesHelper
+	
+	def old_issues
+	  	@issues_by_created_on = @issues.sort {|a,b| a.created_on<=>b.created_on} 
+	  	@issues_by_updated_on = @issues.sort {|a,b| a.updated_on<=>b.updated_on} 
+	end
 
-	before_filter :find_version, :only => [:target_version]
+	# Displays issues by creation date, cumulatively
+	def issue_age_graph
+	
+		# Initialize the graph
+		graph = SVG::Graph::TimeSeries.new({
+			:area_fill => true,
+			:height => 300,
+			:min_y_value => 0,
+			:no_css => true,
+			:show_x_guidelines => true,
+			:scale_x_integers => true,
+			:scale_y_integers => true,
+			:show_data_points => true,
+			:show_data_values => false,
+			:stagger_x_labels => true,
+			:style_sheet => "/plugin_assets/redmine_graphs/stylesheets/issue_age.css",
+			:timescale_divisions => "1 weeks",
+			:width => 800,
+			:x_label_format => "%b %d"
+		})
 
-
-	def target_version
+		# Group issues
+	  	issues_by_created_on = @issues.group_by {|issue| issue.created_on.to_date }.sort
+	  	issues_by_updated_on = @issues.group_by {|issue| issue.updated_on.to_date }.sort
+		
+		# Generate the created_on line
+		created_count = 0
+		created_on_line = Hash.new
+	  	issues_by_created_on.each { |created_on, issues| created_on_line[(created_on-1).to_s] = created_count; created_count += issues.size; created_on_line[created_on.to_s] = created_count }
+	  	created_on_line[Date.today.to_s] = created_count
+	  	graph.add_data({
+			:data => created_on_line.sort.flatten,
+			:title => l(:field_created_on)
+	    })
+	    
+		# Generate the closed_on line
+		updated_count = 0
+	  	updated_on_line = Hash.new
+	  	issues_by_updated_on.each { |updated_on, issues| updated_on_line[(updated_on-1).to_s] = updated_count; updated_count += issues.size; updated_on_line[updated_on.to_s] = updated_count }
+	  	updated_on_line[Date.today.to_s] = updated_count
+	    graph.add_data({
+			:data => updated_on_line.sort.flatten,
+			:title => l(:field_updated_on)
+	    })
+	    	    
+	    # Compile the graph
+		headers["Content-Type"] = "image/svg+xml"
+		send_data(graph.burn, :type => "image/svg+xml", :disposition => "inline")
+	end
+	
+	# Displays open and total issue counts over time
+	def target_version_graph
 
 		# Initialize the graph
 		graph = SVG::Graph::TimeSeries.new({
 			:area_fill => true,
 			:height => 300,
-			:key => true,
 			:no_css => true,
 			:show_x_guidelines => true,
 			:scale_x_integers => true,
@@ -26,12 +82,12 @@ class GraphsController < ApplicationController
 		})
 
 		# Group issues
-	  	issues_by_created_on = @version.fixed_issues.group_by {|issue| issue.created_on.to_date }
-		issues_by_updated_on = @version.fixed_issues.group_by {|issue| issue.updated_on.to_date }
-		issues_by_closed_on = @version.fixed_issues.collect { |issue| issue if issue.closed? }.compact.group_by {|issue| issue.updated_on.to_date }
+	  	issues_by_created_on = @version.fixed_issues.group_by {|issue| issue.created_on.to_date }.sort
+		issues_by_updated_on = @version.fixed_issues.group_by {|issue| issue.updated_on.to_date }.sort
+		issues_by_closed_on = @version.fixed_issues.collect { |issue| issue if issue.closed? }.compact.group_by {|issue| issue.updated_on.to_date }.sort
 	  		  	
 	  	# Set the scope of the graph
-	  	scope_end_date = issues_by_updated_on.sort.keys.last
+	  	scope_end_date = issues_by_updated_on.keys.last
 	  	scope_end_date = @version.effective_date if !@version.effective_date.nil? && @version.effective_date > scope_end_date
 	  	scope_end_date = Date.today if !@version.completed?
 	  	line_end_date = Date.today
@@ -40,7 +96,7 @@ class GraphsController < ApplicationController
 		# Generate the created_on line
 		created_count = 0
 		created_on_line = Hash.new
-	  	issues_by_created_on.sort.each { |created_on, issues| created_on_line[(created_on-1).to_s] = created_count; created_count += issues.size; created_on_line[created_on.to_s] = created_count }
+	  	issues_by_created_on.each { |created_on, issues| created_on_line[(created_on-1).to_s] = created_count; created_count += issues.size; created_on_line[created_on.to_s] = created_count }
 	  	created_on_line[scope_end_date.to_s] = created_count
 	  	graph.add_data({
 			:data => created_on_line.sort.flatten,
@@ -50,7 +106,7 @@ class GraphsController < ApplicationController
 		# Generate the closed_on line
 		closed_count = 0
 	  	closed_on_line = Hash.new
-	  	issues_by_closed_on.sort.each { |closed_on, issues| closed_on_line[(closed_on-1).to_s] = closed_count; closed_count += issues.size; closed_on_line[closed_on.to_s] = closed_count }
+	  	issues_by_closed_on.each { |closed_on, issues| closed_on_line[(closed_on-1).to_s] = closed_count; closed_count += issues.size; closed_on_line[closed_on.to_s] = closed_count }
 	  	closed_on_line[line_end_date.to_s] = closed_count
 	    graph.add_data({
 			:data => closed_on_line.sort.flatten,
@@ -72,6 +128,14 @@ class GraphsController < ApplicationController
 	
 	private
 	
+	def find_issues
+	    @project = Project.find(params[:project_id]) unless params[:project_id].blank?
+	    deny_access unless User.current.allowed_to?(:view_issues, @project, :global => true)
+		@issues = Issue.visible.find(:all, :include => [:status], :conditions => ["#{IssueStatus.table_name}.is_closed=?", false]) if @project.nil?
+		@issues = @project.issues.collect { |issue| issue unless issue.closed? }.compact unless @project.nil?
+	rescue ActiveRecord::RecordNotFound
+		render_404
+	end
 	
 	def find_version
 		@version = Version.find(params[:id])

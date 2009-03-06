@@ -1,6 +1,7 @@
 require 'redmine'
 
 require_dependency 'target_version_graph_hook'
+require_dependency 'old_issues_graph_hook'
 
 Redmine::Plugin.register :redmine_graphs do
   name 'Redmine Graphs plugin'
