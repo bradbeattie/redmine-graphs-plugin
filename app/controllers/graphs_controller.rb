@@ -40,7 +40,8 @@ class GraphsController < ApplicationController
 			issues_by_created_on = issues_by_project[project].group_by {|issue| issue.created_on.to_date }.sort
 			created_count = 0
 			created_on_line = Hash.new
-		  	issues_by_created_on.each { |created_on, issues| created_on_line[(created_on-1).to_s] = created_count; created_count += issues.size; created_on_line[created_on.to_s] = created_count }
+			created_on_line[(issues_by_created_on.first[0]-1).to_s] = 0
+		  	issues_by_created_on.each { |created_on, issues| created_count += issues.size; created_on_line[created_on.to_s] = created_count }
 		  	created_on_line[Date.today.to_s] = created_count
 		  	graph.add_data({
 				:data => created_on_line.sort.flatten,
