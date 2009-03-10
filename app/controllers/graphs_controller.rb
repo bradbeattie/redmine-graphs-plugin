@@ -3,9 +3,55 @@ require 'SVG/Graph/TimeSeries'
 class GraphsController < ApplicationController
 
 	before_filter :find_version, :only => [:target_version_graph]
-	before_filter :find_issues, :only => [:old_issues, :issue_age_graph]
+	before_filter :find_open_issues, :only => [:old_issues, :issue_age_graph]
+	before_filter :find_all_issues, :only => [:issue_growth_graph, :issue_growth]
 	
 	helper IssuesHelper
+	
+	def issue_growth
+	end
+	
+	# Displays projects by total issues over time
+	def issue_growth_graph
+	
+		# Initialize the graph
+		graph = SVG::Graph::TimeSeries.new({
+			:height => 300,
+			:min_y_value => 0,
+			:no_css => true,
+			:show_x_guidelines => true,
+			:scale_x_integers => true,
+			:scale_y_integers => true,
+			:show_data_points => false,
+			:show_data_values => false,
+			:stagger_x_labels => true,
+			:style_sheet => "/plugin_assets/redmine_graphs/stylesheets/issue_growth.css",
+			:timescale_divisions => "1 weeks",
+			:width => 800,
+			:x_label_format => "%b %d"
+		})
+
+		# Group issues
+	  	issues_by_project = @issues.group_by {|issue| issue.project }
+		projects_by_size = issues_by_project.collect { |project, issues| [project, issues.size] }.sort { |a,b| b[1]<=>a[1] }[0..5]
+		
+		# Generate the created_on line
+		projects_by_size.each do |project, size| 		
+			issues_by_created_on = issues_by_project[project].group_by {|issue| issue.created_on.to_date }.sort
+			created_count = 0
+			created_on_line = Hash.new
+		  	issues_by_created_on.each { |created_on, issues| created_on_line[(created_on-1).to_s] = created_count; created_count += issues.size; created_on_line[created_on.to_s] = created_count }
+		  	created_on_line[Date.today.to_s] = created_count
+		  	graph.add_data({
+				:data => created_on_line.sort.flatten,
+				:title => project.name
+		    })
+		end
+		
+	    # Compile the graph
+		headers["Content-Type"] = "image/svg+xml"
+		send_data(graph.burn, :type => "image/svg+xml", :disposition => "inline")
+	end
 	
 	def old_issues
 	  	@issues_by_created_on = @issues.sort {|a,b| a.created_on<=>b.created_on} 
@@ -128,11 +174,20 @@ class GraphsController < ApplicationController
 	
 	private
 	
-	def find_issues
+	def find_open_issues
 	    @project = Project.find(params[:project_id]) unless params[:project_id].blank?
 	    deny_access unless User.current.allowed_to?(:view_issues, @project, :global => true)
 		@issues = Issue.visible.find(:all, :include => [:status], :conditions => ["#{IssueStatus.table_name}.is_closed=?", false]) if @project.nil?
 		@issues = @project.issues.collect { |issue| issue unless issue.closed? }.compact unless @project.nil?
+	rescue ActiveRecord::RecordNotFound
+		render_404
+	end
+		
+	def find_all_issues
+	    @project = Project.find(params[:project_id]) unless params[:project_id].blank?
+	    deny_access unless User.current.allowed_to?(:view_issues, @project, :global => true) if @project.nil?
+		@issues = Issue.visible.find(:all, :include => [:project])
+		@issues = @project.issues unless @project.nil?
 	rescue ActiveRecord::RecordNotFound
 		render_404
 	end
