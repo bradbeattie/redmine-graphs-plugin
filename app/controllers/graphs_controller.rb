@@ -4,7 +4,7 @@ class GraphsController < ApplicationController
 
 	before_filter :find_version, :only => [:target_version_graph]
 	before_filter :find_open_issues, :only => [:old_issues, :issue_age_graph]
-	before_filter :find_optional_project, :only => [:issue_growth_graph]
+	before_filter :find_optional_project, :only => [:issue_growth, :issue_growth_graph]
 	
 	helper IssuesHelper
 	
@@ -37,6 +37,7 @@ class GraphsController < ApplicationController
 		sql << " FROM issues"
 		sql << " LEFT JOIN #{Project.table_name} ON #{Issue.table_name}.project_id = #{Project.table_name}.id"
 		sql << " WHERE (%s)" % Project.allowed_to_condition(User.current, :view_issues)
+		sql << " AND (project_id = #{@project.id})" unless @project.nil? 
 		sql << " GROUP BY project_id"
 		sql << " ORDER BY issue_count DESC"
 		sql << " LIMIT 6"
@@ -46,7 +47,6 @@ class GraphsController < ApplicationController
 		sql = "SELECT project_id, date(#{Issue.table_name}.created_on) as date, COUNT(*) as issue_count"
 		sql << " FROM #{Issue.table_name}"
 		sql << " WHERE project_id IN (%s)" % top_projects.compact.join(',')
-		sql << " AND (project_id = #{@project.id})" unless @project.nil?
 		sql << " GROUP BY project_id, date"
 		issue_counts = ActiveRecord::Base.connection.select_all(sql).group_by { |c| c["project_id"] }
 
