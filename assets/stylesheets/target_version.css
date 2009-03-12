@@ -1,12 +1,11 @@
 #target_version_graph { clear: both; }
 
-.fill1 { fill: #666 !important; }
-.line1 { stroke: #666 !important; }
-.key1, .dataPoint1 { fill: #666 !important; }
+.line1 { stroke: #666666 !important; } .fill1 { fill: #666666 !important; } .key1 { fill: #666666 !important; }
+.line2 { stroke: #009900 !important; } .fill2 { fill: #BAE0BA !important; } .key2 { fill: #009900 !important; }
 
-.fill2 { fill: #BAE0BA !important; fill-opacity: 0.8 !important; }
-.line2 { stroke: #090 !important; }
-.dataPoint2, .key2 { fill: #090 !important; }
+.fill1, .fill2 { fill-opacity: 0.6 !important; }
+.line1, .line2 { stroke-width: 2px !important; }
 
-.key3 { fill: #95964e !important; }
-.dataPoint3 { stroke: #95964e !important; stroke-width: 10px !important; }
+.dataPoint1, .dataPoint2 { display: none !important; }
+.dataPoint3 { stroke: #AA5050 !important; stroke-width: 10px !important; }
+.key3 { fill: #AA5050 !important; }

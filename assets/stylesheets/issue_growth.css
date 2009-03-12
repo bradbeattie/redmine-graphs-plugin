@@ -1,6 +1,9 @@
-.line1 { stroke: #C00 !important; stroke-width: 4px !important; stroke-opacity: 0.8 !important; } .key1 { fill: #C00 !important; }
-.line2 { stroke: #CC0 !important; stroke-width: 4px !important; stroke-opacity: 0.8 !important; } .key2 { fill: #CC0 !important; }
-.line3 { stroke: #0C0 !important; stroke-width: 4px !important; stroke-opacity: 0.8 !important; } .key3 { fill: #0C0 !important; }
-.line4 { stroke: #0CC !important; stroke-width: 4px !important; stroke-opacity: 0.8 !important; } .key4 { fill: #0CC !important; }
-.line5 { stroke: #00C !important; stroke-width: 4px !important; stroke-opacity: 0.8 !important; } .key5 { fill: #00C !important; }
-.line6 { stroke: #C0C !important; stroke-width: 4px !important; stroke-opacity: 0.8 !important; } .key6 { fill: #C0C !important; }
+.line1 { stroke: #C00 !important; } .fill1 { fill: #C00 !important; } .key1 { fill: #C00 !important; }
+.line2 { stroke: #CC0 !important; } .fill2 { fill: #CC0 !important; } .key2 { fill: #CC0 !important; }
+.line3 { stroke: #0C0 !important; } .fill3 { fill: #0C0 !important; } .key3 { fill: #0C0 !important; }
+.line4 { stroke: #0CC !important; } .fill4 { fill: #0CC !important; } .key4 { fill: #0CC !important; }
+.line5 { stroke: #00C !important; } .fill5 { fill: #00C !important; } .key5 { fill: #00C !important; }
+.line6 { stroke: #C0C !important; } .fill6 { fill: #C0C !important; } .key6 { fill: #C0C !important; }
+
+.fill1, .fill2, .fill3, .fill4, .fill5, .fill6 { fill-opacity: 0.6 !important; }
+.line1, .line2, .line3, .line4, .line5, .line6 { stroke-width: 2px !important; }

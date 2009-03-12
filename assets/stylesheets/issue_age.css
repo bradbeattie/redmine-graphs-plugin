@@ -1,7 +1,5 @@
-.fill1  { fill: #666 !important; }
-.line1 { stroke: #666 !important; }
-.dataPoint1, .key1 { fill: #666 !important; }
+.line1 { stroke: #666666 !important; } .fill1 { fill: #666666 !important; } .key1 { fill: #666666 !important; }
+.line2 { stroke: #507AAA !important; } .fill2 { fill: #BACCE0 !important; } .key2 { fill: #507AAA !important; }
 
-.fill2 { fill: #bacce0  !important; fill-opacity: 0.8 !important; }
-.line2 { stroke: #507AAA !important; }
-.dataPoint2, .key2 { fill: #507AAA !important; }
+.fill1, .fill2 { fill-opacity: 0.6 !important; }
+.line1, .line2 { stroke-width: 2px !important; }

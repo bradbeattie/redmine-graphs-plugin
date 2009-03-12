@@ -4,7 +4,7 @@ class GraphsController < ApplicationController
 
 	before_filter :find_version, :only => [:target_version_graph]
 	before_filter :find_open_issues, :only => [:old_issues, :issue_age_graph]
-	before_filter :find_all_issues, :only => [:issue_growth_graph, :issue_growth]
+	before_filter :find_optional_project, :only => [:issue_growth_graph]
 	
 	helper IssuesHelper
 	
@@ -16,6 +16,7 @@ class GraphsController < ApplicationController
 	
 		# Initialize the graph
 		graph = SVG::Graph::TimeSeries.new({
+			:area_fill => true,
 			:height => 300,
 			:min_y_value => 0,
 			:no_css => true,
@@ -26,27 +27,41 @@ class GraphsController < ApplicationController
 			:show_data_values => false,
 			:stagger_x_labels => true,
 			:style_sheet => "/plugin_assets/redmine_graphs/stylesheets/issue_growth.css",
-			:timescale_divisions => "1 weeks",
-			:width => 800,
-			:x_label_format => "%b %d"
+			:timescale_divisions => "1 months",
+			:width => 720,
+			:x_label_format => "%b %y"
 		})
-
-		# Group issues
-	  	issues_by_project = @issues.group_by {|issue| issue.project }
-		projects_by_size = issues_by_project.collect { |project, issues| [project, issues.size] }.sort { |a,b| b[1]<=>a[1] }[0..5]
+	
+		# Get the top visible projects by issue count
+		sql = "SELECT project_id, COUNT(*) issue_count"
+		sql << " FROM issues"
+		sql << " LEFT JOIN #{Project.table_name} ON #{Issue.table_name}.project_id = #{Project.table_name}.id"
+		sql << " WHERE (%s)" % Project.allowed_to_condition(User.current, :view_issues)
+		sql << " GROUP BY project_id"
+		sql << " ORDER BY issue_count DESC"
+		sql << " LIMIT 6"
+		top_projects = ActiveRecord::Base.connection.select_all(sql).collect { |p| p["project_id"] }
 		
-		# Generate the created_on line
-		projects_by_size.each do |project, size| 		
-			issues_by_created_on = issues_by_project[project].group_by {|issue| issue.created_on.to_date }.sort
+		# Get the issues created per project, per day
+		sql = "SELECT project_id, date(#{Issue.table_name}.created_on) as date, COUNT(*) as issue_count"
+		sql << " FROM #{Issue.table_name}"
+		sql << " WHERE project_id IN (%s)" % top_projects.compact.join(',')
+		sql << " AND (project_id = #{@project.id})" unless @project.nil?
+		sql << " GROUP BY project_id, date"
+		issue_counts = ActiveRecord::Base.connection.select_all(sql).group_by { |c| c["project_id"] }
+
+		# Generate the created_on lines
+		top_projects.each do |project_id, total_count|
+			counts = issue_counts[project_id].sort { |a,b| a["date"]<=>b["date"] } 		
 			created_count = 0
 			created_on_line = Hash.new
-			created_on_line[(issues_by_created_on.first[0]-1).to_s] = 0
-		  	issues_by_created_on.each { |created_on, issues| created_count += issues.size; created_on_line[created_on.to_s] = created_count }
+			created_on_line[(Date.parse(counts.first["date"])-1).to_s] = 0
+		  	counts.each { |count| created_count += count["issue_count"].to_i; created_on_line[count["date"]] = created_count }
 		  	created_on_line[Date.today.to_s] = created_count
 		  	graph.add_data({
 				:data => created_on_line.sort.flatten,
-				:title => project.name
-		    })
+				:title => Project.find(project_id).to_s
+			})
 		end
 		
 	    # Compile the graph
@@ -71,12 +86,12 @@ class GraphsController < ApplicationController
 			:show_x_guidelines => true,
 			:scale_x_integers => true,
 			:scale_y_integers => true,
-			:show_data_points => true,
+			:show_data_points => false,
 			:show_data_values => false,
 			:stagger_x_labels => true,
 			:style_sheet => "/plugin_assets/redmine_graphs/stylesheets/issue_age.css",
 			:timescale_divisions => "1 weeks",
-			:width => 800,
+			:width => 720,
 			:x_label_format => "%b %d"
 		})
 
@@ -176,19 +191,16 @@ class GraphsController < ApplicationController
 	private
 	
 	def find_open_issues
-	    @project = Project.find(params[:project_id]) unless params[:project_id].blank?
-	    deny_access unless User.current.allowed_to?(:view_issues, @project, :global => true)
+	    find_optional_project
 		@issues = Issue.visible.find(:all, :include => [:status], :conditions => ["#{IssueStatus.table_name}.is_closed=?", false]) if @project.nil?
 		@issues = @project.issues.collect { |issue| issue unless issue.closed? }.compact unless @project.nil?
 	rescue ActiveRecord::RecordNotFound
 		render_404
 	end
 		
-	def find_all_issues
+	def find_optional_project
 	    @project = Project.find(params[:project_id]) unless params[:project_id].blank?
-	    deny_access unless User.current.allowed_to?(:view_issues, @project, :global => true) if @project.nil?
-		@issues = Issue.visible.find(:all, :include => [:project])
-		@issues = @project.issues unless @project.nil?
+	    deny_access unless User.current.allowed_to?(:view_issues, @project, :global => true)
 	rescue ActiveRecord::RecordNotFound
 		render_404
 	end
