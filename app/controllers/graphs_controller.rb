@@ -29,7 +29,7 @@ class GraphsController < ApplicationController
 			:style_sheet => "/plugin_assets/redmine_graphs/stylesheets/issue_growth.css",
 			:timescale_divisions => "1 months",
 			:width => 720,
-			:x_label_format => "%b %y"
+			:x_label_format => "%b %Y"
 		})
 	
 		# Get the top visible projects by issue count
