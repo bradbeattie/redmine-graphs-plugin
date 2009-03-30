@@ -33,7 +33,7 @@ class GraphsController < ApplicationController
 		})
 	
 		# Get the top visible projects by issue count
-		sql = "SELECT project_id, COUNT(*) issue_count"
+		sql = "SELECT project_id, COUNT(*) as issue_count"
 		sql << " FROM issues"
 		sql << " LEFT JOIN #{Project.table_name} ON #{Issue.table_name}.project_id = #{Project.table_name}.id"
 		sql << " WHERE (%s)" % Project.allowed_to_condition(User.current, :view_issues)
