@@ -7,3 +7,5 @@
 
 .fill1, .fill2, .fill3, .fill4, .fill5, .fill6 { fill-opacity: 0.6 !important; }
 .line1, .line2, .line3, .line4, .line5, .line6 { stroke-width: 2px !important; }
+
+.guideLines { stroke-opacity: 0.2 !important; }

@@ -9,3 +9,5 @@
 .dataPoint1, .dataPoint2 { display: none !important; }
 .dataPoint3 { stroke: #AA5050 !important; stroke-width: 10px !important; }
 .key3 { fill: #AA5050 !important; }
+
+.guideLines { stroke-opacity: 0.2 !important; }
