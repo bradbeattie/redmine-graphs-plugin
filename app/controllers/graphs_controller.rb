@@ -145,6 +145,7 @@ class GraphsController < ApplicationController
             :x_label_format => "%b %d"
         })
 
+
         # Group issues
         issues_by_created_on = @version.fixed_issues.group_by {|issue| issue.created_on.to_date }.sort
         issues_by_updated_on = @version.fixed_issues.group_by {|issue| issue.updated_on.to_date }.sort
