@@ -29,9 +29,8 @@ class GraphsController < ApplicationController
             :show_data_values => false,
             :stagger_x_labels => true,
             :style_sheet => "/plugin_assets/redmine_graphs/stylesheets/issue_growth.css",
-            :timescale_divisions => "1 months",
             :width => 720,
-            :x_label_format => "%b %Y"
+            :x_label_format => "%Y-%m-%d"
         })
     
         # Get the top visible projects by issue count
@@ -92,7 +91,6 @@ class GraphsController < ApplicationController
             :show_data_values => false,
             :stagger_x_labels => true,
             :style_sheet => "/plugin_assets/redmine_graphs/stylesheets/issue_age.css",
-            :timescale_divisions => "1 weeks",
             :width => 720,
             :x_label_format => "%b %d"
         })
