@@ -10,6 +10,23 @@ class GraphsController < ApplicationController
     
     helper IssuesHelper
     
+    def issue_status_flow
+        # Get the top visible projects by issue count
+        sql = " select is1.id as old_status, is2.id as new_status, count(*) as changes_count"
+        sql << " from journals as j"
+        sql << " left join journal_details as jd on j.id = jd.journal_id"
+        sql << " left join issue_statuses as is1 on jd.old_value = is1.id"
+        sql << " left join issue_statuses as is2 on jd.value = is2.id"
+        sql << " where journalized_type = 'issue' and prop_key = 'status_id' and  DATE_SUB(CURRENT_TIMESTAMP, INTERVAL 10 DAY) <= created_on"
+        sql << " group by old_value, value"
+        sql << " order by is1.position, is2.position"
+        @status_changes = ActiveRecord::Base.connection.select_all(sql)
+        @issue_statuses = IssueStatus.find(:all).sort { |a,b| a.position<=>b.position }
+        
+        headers["Content-Type"] = "image/svg+xml"
+        render :layout => false
+    end
+    
     def issue_growth
     end
     
