@@ -17,7 +17,7 @@ class GraphsController < ApplicationController
         sql << " left join journal_details as jd on j.id = jd.journal_id"
         sql << " left join issue_statuses as is1 on jd.old_value = is1.id"
         sql << " left join issue_statuses as is2 on jd.value = is2.id"
-        sql << " where journalized_type = 'issue' and prop_key = 'status_id' and  DATE_SUB(CURRENT_TIMESTAMP, INTERVAL 10 DAY) <= created_on"
+        sql << " where journalized_type = 'issue' and prop_key = 'status_id' and  DATE_SUB(CURRENT_TIMESTAMP, INTERVAL 15 DAY) <= created_on"
         sql << " group by old_value, value"
         sql << " order by is1.position, is2.position"
         @status_changes = ActiveRecord::Base.connection.select_all(sql)

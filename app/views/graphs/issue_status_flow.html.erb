@@ -13,14 +13,24 @@
 %>
 
 <svg xmlns="http://www.w3.org/2000/svg" version="1.0" width="400" height="744">
-  <g stroke="black" stroke-width="10">
+  <g fill-opacity="0.5">
     <% @status_changes.each do |status_change| %>
-        <line
-            y2="<%= points[status_change["old_status"].to_i]["y"] %>"
-            x2="<%= points[status_change["old_status"].to_i]["x"] %>"
-            y1="<%= points[status_change["new_status"].to_i]["y"] %>"
-            x1="<%= points[status_change["new_status"].to_i]["x"] %>"
-            stroke-width="<%= status_change["changes_count"].to_i %>"
+        <%
+            changes_count = status_change["changes_count"].to_i
+            
+            x1 = points[status_change["old_status"].to_i]["x"]
+            y1 = points[status_change["old_status"].to_i]["y"]
+            
+            x2 = points[status_change["new_status"].to_i]["x"]
+            y2 = points[status_change["new_status"].to_i]["y"]
+            
+            x1a = x1 # f(changes_count)
+            y1a = y1 # f(changes_count)
+            x1b = x1 # f(changes_count)
+            y1b = y1 # f(changes_count)
+        %>
+        <polygon
+            points="<%= x1a %>,<%= y1a %> <%= x1b %>,<%= y1b %> <%= x2 %>,<%= y2 %>"
         />
     <% end %>
   </g>
@@ -29,7 +39,7 @@
         <circle cx="<%= point["x"] %>" cy="<%= point["y"] %>" r="40" />
     <% end %>
   </g>
-  <g font-family="Arial" font-size="13" font-weight="700" text-anchor="middle">
+  <g font-family="Helvetica, Arial" font-size="13" text-anchor="middle">
     <% points.each do |status_id, point| %>
         <text x="<%= point["x"] %>" y="<%= point["y"] %>"><%= issue_statuses_by_id[status_id] %></text>
     <% end %>
