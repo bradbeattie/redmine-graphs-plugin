@@ -13,10 +13,10 @@
 %>
 
 <svg xmlns="http://www.w3.org/2000/svg" version="1.0" width="400" height="744">
-  <g fill-opacity="0.5">
+  <g fill-opacity="0.5" stroke="black">
     <% @status_changes.each do |status_change| %>
         <%
-            changes_count = status_change["changes_count"].to_i
+            changes_count = [status_change["changes_count"].to_i,40].min
             
             x1 = points[status_change["old_status"].to_i]["x"]
             y1 = points[status_change["old_status"].to_i]["y"]
@@ -24,10 +24,15 @@
             x2 = points[status_change["new_status"].to_i]["x"]
             y2 = points[status_change["new_status"].to_i]["y"]
             
-            x1a = x1 # f(changes_count)
-            y1a = y1 # f(changes_count)
-            x1b = x1 # f(changes_count)
-            y1b = y1 # f(changes_count)
+            atan2 = -Math.atan2(y1-y2,x1-x2)
+            xdiff = Math.sin(atan2)*changes_count
+            ydiff = Math.cos(atan2)*changes_count
+            
+            
+            x1a = x1 + xdiff
+            y1a = y1 + ydiff
+            x1b = x1 - xdiff
+            y1b = y1 - ydiff
         %>
         <polygon
             points="<%= x1a %>,<%= y1a %> <%= x1b %>,<%= y1b %> <%= x2 %>,<%= y2 %>"
