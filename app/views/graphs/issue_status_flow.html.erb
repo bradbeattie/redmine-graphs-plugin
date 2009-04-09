@@ -13,7 +13,7 @@
 %>
 
 <svg xmlns="http://www.w3.org/2000/svg" version="1.0" width="400" height="744">
-  <g fill-opacity="0.2" stroke="black" stroke-opacity="0.5">
+  <g fill-opacity="0.2" stroke-opacity="0.5">
     <% @status_changes.each do |status_change| %>
         <%
             changes_count = [status_change["changes_count"].to_i,40].min
@@ -38,6 +38,7 @@
         <polygon
             points="<%= x1a %>,<%= y1a %> <%= x1b %>,<%= y1b %> <%= x2 %>,<%= y2 %>"
             fill="<%= issue_statuses_by_id[old_status].position > issue_statuses_by_id[new_status].position ? "red" : "green" %>"
+            stroke="<%= issue_statuses_by_id[old_status].position > issue_statuses_by_id[new_status].position ? "red" : "green" %>"
         />
     <% end %>
   </g>
