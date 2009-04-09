@@ -12,11 +12,11 @@
     end
 %>
 
-<svg xmlns="http://www.w3.org/2000/svg" version="1.0" width="400" height="744">
+<svg xmlns="http://www.w3.org/2000/svg" version="1.0" width="300" height="300">
   <g fill-opacity="0.2" stroke-opacity="0.5">
     <% @status_changes.each do |status_change| %>
         <%
-            changes_count = [status_change["changes_count"].to_i,40].min
+            changes_count = [status_change["changes_count"].to_i+5,35].min
             old_status = status_change["old_status"].to_i
             new_status = status_change["new_status"].to_i
             
@@ -29,27 +29,26 @@
             atan2 = -Math.atan2(y1-y2,x1-x2)
             xdiff = Math.sin(atan2)*changes_count
             ydiff = Math.cos(atan2)*changes_count
-            
-            x1a = x1 + xdiff
-            y1a = y1 + ydiff
-            x1b = x1 - xdiff
-            y1b = y1 - ydiff
         %>
         <polygon
-            points="<%= x1a %>,<%= y1a %> <%= x1b %>,<%= y1b %> <%= x2 %>,<%= y2 %>"
+            points="
+                <%= x1-xdiff %>,<%= y1-ydiff %>
+                <%= x1+xdiff %>,<%= y1+ydiff %>
+                <%= x2+xdiff/5 %>,<%= y2+ydiff/5 %>
+                <%= x2-xdiff/5 %>,<%= y2-ydiff/5 %>"
             fill="<%= issue_statuses_by_id[old_status].position > issue_statuses_by_id[new_status].position ? "red" : "green" %>"
             stroke="<%= issue_statuses_by_id[old_status].position > issue_statuses_by_id[new_status].position ? "red" : "green" %>"
         />
     <% end %>
   </g>
-  <g fill="white" stroke="black" stroke-width="3.5">
+  <g fill="white" stroke="black" stroke-width="2" stroke-opacity="0.5">
     <% points.each do |status_id, point| %>
-        <circle cx="<%= point["x"] %>" cy="<%= point["y"] %>" r="40" />
+        <circle cx="<%= point["x"] %>" cy="<%= point["y"] %>" r="35" />
     <% end %>
   </g>
-  <g font-family="Helvetica, Arial" font-size="13" text-anchor="middle">
+  <g font-family="Helvetica, Arial" font-size="12" text-anchor="middle">
     <% points.each do |status_id, point| %>
-        <text x="<%= point["x"] %>" y="<%= point["y"] %>"><%= issue_statuses_by_id[status_id] %></text>
+        <text x="<%= point["x"] %>" y="<%= point["y"] + 3 %>"><%= issue_statuses_by_id[status_id] %></text>
     <% end %>
   </g>
 </svg>
