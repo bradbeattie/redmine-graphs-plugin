@@ -1,0 +1,5 @@
+<h3><%= l(:label_graphs_issue_status_flow) %></h3>
+
+<div style="text-align: center">
+<%= tag("embed", :width => "300", :height => 300, :type => "image/svg+xml", :src => url_for(:controller => 'graphs', :action => 'issue_status_flow_graph')) %>
+</div>

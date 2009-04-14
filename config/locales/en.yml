@@ -3,4 +3,4 @@ en:
   label_graphs_total_vs_closed_issues: Total issues vs. Closed issues
   label_graphs_old_issues: Open aging issues
   label_graphs_issue_growth: Total issues over time
-  
+  label_graphs_issue_status_flow: Recent status changes (within 24 hours)

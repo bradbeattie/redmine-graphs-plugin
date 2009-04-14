@@ -7,12 +7,15 @@
     points = Hash.new
     i = -1
     @issue_statuses.each do |issue_status|
-        points[issue_status.id] = {"x" => Math.sin(2*Math::PI*i/@issue_statuses.size)*100 + 150, "y" => Math.cos(2*Math::PI*i/@issue_statuses.size)*100 + 150}
+        points[issue_status.id] = {
+            "x" => Math.sin(2*Math::PI*i/@issue_statuses.size)*100 + 140,
+            "y" => Math.cos(2*Math::PI*i/@issue_statuses.size)*100 + 125
+        }
         i -= 1
     end
 %>
 
-<svg xmlns="http://www.w3.org/2000/svg" version="1.0" width="300" height="300">
+<svg xmlns="http://www.w3.org/2000/svg" version="1.0" width="280" height="270">
   <g fill-opacity="0.2" stroke-opacity="0.5">
     <% @status_changes.each do |status_change| %>
         <%
@@ -41,7 +44,7 @@
         />
     <% end %>
   </g>
-  <g fill="white" stroke="black" stroke-width="2" stroke-opacity="0.5">
+  <g fill="#EEEEEE" stroke="black" stroke-width="1" stroke-opacity="0.75">
     <% points.each do |status_id, point| %>
         <circle cx="<%= point["x"] %>" cy="<%= point["y"] %>" r="35" />
     <% end %>

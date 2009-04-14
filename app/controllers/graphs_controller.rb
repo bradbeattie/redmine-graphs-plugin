@@ -10,7 +10,7 @@ class GraphsController < ApplicationController
     
     helper IssuesHelper
     
-    def issue_status_flow
+    def issue_status_flow_graph
         # Get the top visible projects by issue count
         sql = " select is1.id as old_status, is2.id as new_status, count(*) as changes_count"
         sql << " from journals as j"
