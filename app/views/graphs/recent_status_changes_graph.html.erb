@@ -8,14 +8,14 @@
     i = -1
     @issue_statuses.each do |issue_status|
         points[issue_status.id] = {
-            "x" => Math.sin(2*Math::PI*i/@issue_statuses.size)*100 + 150,
-            "y" => Math.cos(2*Math::PI*i/@issue_statuses.size)*100 + 150
+            "x" => Math.sin(2*Math::PI*i/@issue_statuses.size)*100 + 140,
+            "y" => Math.cos(2*Math::PI*i/@issue_statuses.size)*100 + 140
         }
         i -= 1
     end
 %>
 
-<svg xmlns="http://www.w3.org/2000/svg" version="1.0" width="300" height="300">
+<svg xmlns="http://www.w3.org/2000/svg" version="1.0" width="280" height="280">
   <g fill-opacity="0.2" stroke-opacity="0.5">
     <% @status_changes.each do |status_change| %>
         <%
