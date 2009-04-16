@@ -3,4 +3,4 @@ fr:
   label_graphs_total_vs_closed_issues: Fermetures / Total
   label_graphs_old_issues: Age des demandes
   label_graphs_issue_growth: Total des demandes
-  label_graphs_issue_status_flow: Changements recent (dans les dernieres 24 heures)
+  label_graphs_issue_status_flow: Changements récents (dans les dernières 24 heures)
