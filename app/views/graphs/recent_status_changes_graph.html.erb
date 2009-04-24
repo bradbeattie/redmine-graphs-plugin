@@ -19,7 +19,7 @@
   <g fill-opacity="0.2" stroke-opacity="0.5">
     <% @status_changes.each do |status_change| %>
         <%
-            changes_count = [status_change["changes_count"].to_i+5,35].min
+            changes_count = [status_change["changes_count"].to_i*3,35].min
             old_status = status_change["old_status"].to_i
             new_status = status_change["new_status"].to_i
             
