@@ -4,3 +4,4 @@ en:
   label_graphs_old_issues: Open aging issues
   label_graphs_issue_growth: Total issues over time
   label_graphs_issue_status_flow: Recent status changes (within 24 hours)
+  label_graphs_issue_status_flow: Recent assignment changes (within 24 hours)
