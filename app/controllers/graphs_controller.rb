@@ -9,6 +9,26 @@ class GraphsController < ApplicationController
     before_filter :find_optional_project, :only => [:issue_growth, :issue_growth_graph]
     
     helper IssuesHelper
+        
+    def recent_assigned_to_changes_graph
+        # Get the top visible projects by issue count
+        sql = " select u1.id as old_user, u2.id as new_user, count(*) as changes_count"
+        sql << " from journals as j"
+        sql << " left join journal_details as jd on j.id = jd.journal_id"
+        sql << " left join users as u1 on jd.old_value = u1.id"
+        sql << " left join users as u2 on jd.value = u2.id"
+        sql << " where journalized_type = 'issue' and prop_key = 'assigned_to_id' and  DATE_SUB(CURRENT_TIMESTAMP, INTERVAL 1 DAY) <= j.created_on"
+        sql << " and (u1.id = #{User.current.id} or u2.id = #{User.current.id})"
+        sql << " and u1.id <> 0 and u2.id <> 0"
+        sql << " group by old_value, value"
+        @assigned_to_changes = ActiveRecord::Base.connection.select_all(sql)
+        user_ids = @assigned_to_changes.collect { |change| [change["old_user"].to_i, change["new_user"].to_i] }.flatten.uniq
+        user_ids.delete(User.current.id)
+        @users = User.find(:all, :conditions => "id IN ("+user_ids.join(',')+")").index_by { |user| user.id } unless user_ids.empty?
+        
+        headers["Content-Type"] = "image/svg+xml"
+        render :layout => false
+    end
     
     def recent_status_changes_graph
         # Get the top visible projects by issue count

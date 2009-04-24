@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.0//EN" "http://www.w3.org/TR/2001/REC-SVG-20010904/DTD/svg10.dtd">
+
+<%
+    points = Hash.new
+    points[User.current.id] = { "x" => 140, "y" => 140 }
+    i = -1
+    @users.each do |user_id, user|
+        points[user_id] = {
+            "x" => Math.sin(2*Math::PI*i/@users.size)*100 + 140,
+            "y" => Math.cos(2*Math::PI*i/@users.size)*100 + 140
+        }
+        i -= 1
+    end unless @users.nil?
+%>
+
+<svg xmlns="http://www.w3.org/2000/svg" version="1.0" width="280" height="280">
+  <g fill-opacity="0.2" stroke-opacity="0.5">
+    <% @assigned_to_changes.each do |assigned_to_change| %>
+        <%
+            changes_count = [assigned_to_change["changes_count"].to_i*3,35].min
+            old_user = assigned_to_change["old_user"].to_i
+            new_user = assigned_to_change["new_user"].to_i
+            
+            x1 = points[old_user]["x"]
+            y1 = points[old_user]["y"]
+            
+            x2 = points[new_user]["x"]
+            y2 = points[new_user]["y"]
+            
+            atan2 = -Math.atan2(y1-y2,x1-x2)
+            xdiff = Math.sin(atan2)*changes_count
+            ydiff = Math.cos(atan2)*changes_count
+        %>
+        <polygon
+            points="
+                <%= x1-xdiff %>,<%= y1-ydiff %>
+                <%= x1+xdiff %>,<%= y1+ydiff %>
+                <%= x2+xdiff/5 %>,<%= y2+ydiff/5 %>
+                <%= x2-xdiff/5 %>,<%= y2-ydiff/5 %>"
+            fill="<%= assigned_to_change["old_user"].to_i == User.current.id ? "green" : "red" %>"
+            stroke="<%= assigned_to_change["old_user"].to_i == User.current.id ? "green" : "red" %>"
+        />
+    <% end %>
+  </g>
+  <g fill="#EEEEEE" stroke="black" stroke-width="1" stroke-opacity="0.75">
+    <% points.each do |user_id, point| %>
+        <circle cx="<%= point["x"] %>" cy="<%= point["y"] %>" r="35" />
+    <% end %>
+  </g>
+  <g font-family="Helvetica, Arial" font-size="12" text-anchor="middle">
+    <% points.each do |user_id, point| %>
+        <text x="<%= point["x"] %>" y="<%= point["y"] + 3 %>"><%= user_id == User.current.id ? User.current : @users[user_id] %></text>
+    <% end %>
+  </g>
+</svg>
