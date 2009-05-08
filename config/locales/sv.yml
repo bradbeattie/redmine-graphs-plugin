@@ -1,0 +1,7 @@
+sv:
+  label_graphs: Grafer
+  label_graphs_total_vs_closed_issues: Antal åtgärder mot stängda åtgärder
+  label_graphs_old_issues: Öppna föråldrade åtgärder
+  label_graphs_issue_growth: Totala åtgärder över tid
+  label_graphs_issue_status_flow: Statusförändringar det senaste dygnet
+  label_graphs_assigned_to_status_flow: Tilldelningsskillnader det senaste dygnet
