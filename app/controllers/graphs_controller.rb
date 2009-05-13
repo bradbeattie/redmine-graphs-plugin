@@ -2,6 +2,10 @@ require 'SVG/Graph/TimeSeries'
 
 class GraphsController < ApplicationController
 
+    ############################################################################
+    # Initialization
+    ############################################################################
+    
     menu_item :issues, :only => [:issue_growth, :old_issues]
 
     before_filter :find_version, :only => [:target_version_graph]
@@ -9,7 +13,13 @@ class GraphsController < ApplicationController
     before_filter :find_optional_project, :only => [:issue_growth, :issue_growth_graph]
     
     helper IssuesHelper
-        
+
+    
+    ############################################################################
+    # My Page block graphs
+    ############################################################################
+    
+    # Displays a ring of issue assignement changes around the current user
     def recent_assigned_to_changes_graph
         # Get the top visible projects by issue count
         sql = " select u1.id as old_user, u2.id as new_user, count(*) as changes_count"
@@ -25,11 +35,11 @@ class GraphsController < ApplicationController
         user_ids = @assigned_to_changes.collect { |change| [change["old_user"].to_i, change["new_user"].to_i] }.flatten.uniq
         user_ids.delete(User.current.id)
         @users = User.find(:all, :conditions => "id IN ("+user_ids.join(',')+")").index_by { |user| user.id } unless user_ids.empty?
-        
         headers["Content-Type"] = "image/svg+xml"
         render :layout => false
     end
     
+    # Displays a ring of issue status changes
     def recent_status_changes_graph
         # Get the top visible projects by issue count
         sql = " select is1.id as old_status, is2.id as new_status, count(*) as changes_count"
@@ -42,13 +52,31 @@ class GraphsController < ApplicationController
         sql << " order by is1.position, is2.position"
         @status_changes = ActiveRecord::Base.connection.select_all(sql)
         @issue_statuses = IssueStatus.find(:all).sort { |a,b| a.position<=>b.position }
-        
         headers["Content-Type"] = "image/svg+xml"
         render :layout => false
     end
     
+    
+    ############################################################################
+    # Graph pages
+    ############################################################################
+    
+    # Displays total number of issues over time
     def issue_growth
+        render_404 if @project && @project.issues.empty?
     end
+    
+    # Displays created vs update date on open issues over time    
+    def old_issues
+        render_404 if @project && @project.issues.empty?
+        @issues_by_created_on = @issues.sort {|a,b| a.created_on<=>b.created_on} 
+        @issues_by_updated_on = @issues.sort {|a,b| a.updated_on<=>b.updated_on} 
+    end
+    
+        
+    ############################################################################
+    # Embedded graphs for graph pages
+    ############################################################################
     
     # Displays projects by total issues over time
     def issue_growth_graph
@@ -106,11 +134,7 @@ class GraphsController < ApplicationController
         headers["Content-Type"] = "image/svg+xml"
         send_data(graph.burn, :type => "image/svg+xml", :disposition => "inline")
     end
-    
-    def old_issues
-          @issues_by_created_on = @issues.sort {|a,b| a.created_on<=>b.created_on} 
-          @issues_by_updated_on = @issues.sort {|a,b| a.updated_on<=>b.updated_on} 
-    end
+
 
     # Displays issues by creation date, cumulatively
     def issue_age_graph
@@ -226,6 +250,9 @@ class GraphsController < ApplicationController
     end
     
     
+    ############################################################################
+    # Private methods
+    ############################################################################
     private
     
     def find_open_issues
