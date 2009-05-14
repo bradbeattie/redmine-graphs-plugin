@@ -103,7 +103,11 @@ class GraphsController < ApplicationController
         sql << " FROM issues"
         sql << " LEFT JOIN #{Project.table_name} ON #{Issue.table_name}.project_id = #{Project.table_name}.id"
         sql << " WHERE (%s)" % Project.allowed_to_condition(User.current, :view_issues)
-        sql << " AND (project_id = #{@project.id})" unless @project.nil? 
+        unless @project.nil?
+            sql << " AND (project_id = #{@project.id}"
+            sql << "    OR project_id IN (%s)" % @project.descendants.active.visible.collect { |p| p.id }.join(',') unless @project.descendants.active.visible.nil?
+            sql << " )"
+        end 
         sql << " GROUP BY project_id"
         sql << " ORDER BY issue_count DESC"
         sql << " LIMIT 6"
