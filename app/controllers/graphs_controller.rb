@@ -264,8 +264,7 @@ class GraphsController < ApplicationController
         if !@project.nil?
             ids = [@project.id]
             ids += @project.descendants.active.visible.collect(&:id)
-            @issues = Issue.visible.find(:all, :include => [:status], :conditions => ["#{Project.table_name}.id IN (?) AND #{IssueStatus.table_name}.is_closed=?", ids.join(','), false])
-            params[:asdfadfasdf] = @issues
+            @issues = Issue.visible.find(:all, :include => [:status], :conditions => ["#{IssueStatus.table_name}.is_closed=? AND #{Project.table_name}.id IN (?)", false, ids])
         else
             @issues = Issue.visible.find(:all, :include => [:status], :conditions => ["#{IssueStatus.table_name}.is_closed=?", false])
         end
