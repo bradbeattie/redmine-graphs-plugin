@@ -105,7 +105,7 @@ class GraphsController < ApplicationController
         sql << " WHERE (%s)" % Project.allowed_to_condition(User.current, :view_issues)
         unless @project.nil?
             sql << " AND (project_id = #{@project.id}"
-            sql << "    OR project_id IN (%s)" % @project.descendants.active.visible.collect { |p| p.id }.join(',') unless @project.descendants.active.visible.nil?
+            sql << "    OR project_id IN (%s)" % @project.descendants.active.visible.collect { |p| p.id }.join(',') unless @project.descendants.active.visible.empty?
             sql << " )"
         end 
         sql << " GROUP BY project_id"
@@ -261,8 +261,14 @@ class GraphsController < ApplicationController
     
     def find_open_issues
         find_optional_project
-        @issues = Issue.visible.find(:all, :include => [:status], :conditions => ["#{IssueStatus.table_name}.is_closed=?", false]) if @project.nil?
-        @issues = @project.issues.collect { |issue| issue unless issue.closed? }.compact unless @project.nil?
+        if !@project.nil?
+            ids = [@project.id]
+            ids += @project.descendants.active.visible.collect(&:id)
+            @issues = Issue.visible.find(:all, :include => [:status], :conditions => ["#{Project.table_name}.id IN (?) AND #{IssueStatus.table_name}.is_closed=?", ids.join(','), false])
+            params[:asdfadfasdf] = @issues
+        else
+            @issues = Issue.visible.find(:all, :include => [:status], :conditions => ["#{IssueStatus.table_name}.is_closed=?", false])
+        end
     rescue ActiveRecord::RecordNotFound
         render_404
     end
