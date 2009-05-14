@@ -1,6 +1,8 @@
 <h2><%= l(:label_graphs_old_issues) %></h2>
-<%= tag("embed", :width => "100%", :height => 300, :type => "image/svg+xml", :src => url_for(:controller => 'graphs', :action => 'issue_age_graph')) if @project.nil? %>
-<%= tag("embed", :width => "100%", :height => 300, :type => "image/svg+xml", :src => url_for(:controller => 'graphs', :action => 'issue_age_graph', :project_id => @project.id)) unless @project.nil? %>
+<% unless @issues_by_created_on.empty? %>
+    <%= tag("embed", :width => "100%", :height => 300, :type => "image/svg+xml", :src => url_for(:controller => 'graphs', :action => 'issue_age_graph')) if @project.nil? %>
+    <%= tag("embed", :width => "100%", :height => 300, :type => "image/svg+xml", :src => url_for(:controller => 'graphs', :action => 'issue_age_graph', :project_id => @project.id)) unless @project.nil? %>
+<% end %>
 
 <div class="splitcontentleft">
 	<h3 class="icon icon-time"><%= l(:label_issues_by, :value => l(:field_created_on)) %></h3>

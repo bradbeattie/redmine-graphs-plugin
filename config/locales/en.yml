@@ -5,3 +5,5 @@ en:
   label_graphs_issue_growth: Total issues over time
   label_graphs_issue_status_flow: Recent status changes (within 24 hours)
   label_graphs_assigned_to_status_flow: Recent assignment changes (within 24 hours)
+  warning_no_issues: There are no issues to graph.
+  

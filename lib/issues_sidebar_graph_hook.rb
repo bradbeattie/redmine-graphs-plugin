@@ -8,7 +8,7 @@ class IssuesSidebarGraphHook < Redmine::Hook::ViewListener
         output << link_to(l(:label_graphs_issue_growth), {:controller => 'graphs', :action => 'issue_growth', :only_path => true})
         output << "<br/>"
         return output
-  	elsif !context[:project].nil? && !context[:project].issues.empty?
+  	elsif !context[:project].nil?
         output = "<h3>#{l(:label_graphs)}</h3>"
         output << link_to(l(:label_graphs_old_issues), {:controller => 'graphs', :action => 'old_issues', :project_id => context[:project], :only_path => true})
         output << "<br/>"

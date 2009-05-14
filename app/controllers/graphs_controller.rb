@@ -9,8 +9,8 @@ class GraphsController < ApplicationController
     menu_item :issues, :only => [:issue_growth, :old_issues]
 
     before_filter :find_version, :only => [:target_version_graph]
+    before_filter :confirm_issues_exist, :only => [:issue_growth]
     before_filter :find_open_issues, :only => [:old_issues, :issue_age_graph]
-    before_filter :find_optional_project, :only => [:issue_growth, :issue_growth_graph]
     
     helper IssuesHelper
 
@@ -63,14 +63,12 @@ class GraphsController < ApplicationController
     
     # Displays total number of issues over time
     def issue_growth
-        render_404 if @project && @project.issues.empty?
     end
     
     # Displays created vs update date on open issues over time    
     def old_issues
-        render_404 if @project && @project.issues.empty?
         @issues_by_created_on = @issues.sort {|a,b| a.created_on<=>b.created_on} 
-        @issues_by_updated_on = @issues.sort {|a,b| a.updated_on<=>b.updated_on} 
+        @issues_by_updated_on = @issues.sort {|a,b| a.updated_on<=>b.updated_on}
     end
     
         
@@ -97,7 +95,7 @@ class GraphsController < ApplicationController
             :width => 720,
             :x_label_format => "%Y-%m-%d"
         })
-    
+        
         # Get the top visible projects by issue count
         sql = "SELECT project_id, COUNT(*) as issue_count"
         sql << " FROM issues"
@@ -172,7 +170,7 @@ class GraphsController < ApplicationController
         graph.add_data({
             :data => created_on_line.sort.flatten,
             :title => l(:field_created_on)
-        })
+        }) unless issues_by_created_on.empty?
         
         # Generate the closed_on line
         updated_count = 0
@@ -182,8 +180,8 @@ class GraphsController < ApplicationController
         graph.add_data({
             :data => updated_on_line.sort.flatten,
             :title => l(:field_updated_on)
-        })
-                
+        }) unless issues_by_updated_on.empty?
+        
         # Compile the graph
         headers["Content-Type"] = "image/svg+xml"
         send_data(graph.burn, :type => "image/svg+xml", :disposition => "inline")
@@ -258,6 +256,19 @@ class GraphsController < ApplicationController
     # Private methods
     ############################################################################
     private
+            
+    def confirm_issues_exist
+        find_optional_project
+        if !@project.nil?
+            ids = [@project.id]
+            ids += @project.descendants.active.visible.collect(&:id)
+            @issues = Issue.visible.find(:first, :conditions => ["#{Project.table_name}.id IN (?)", ids])
+        else
+            @issues = Issue.visible.find(:first)
+        end
+    rescue ActiveRecord::RecordNotFound
+        render_404
+    end
     
     def find_open_issues
         find_optional_project
