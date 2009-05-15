@@ -10,6 +10,7 @@ class GraphsController < ApplicationController
 
     before_filter :find_version, :only => [:target_version_graph]
     before_filter :confirm_issues_exist, :only => [:issue_growth]
+    before_filter :find_optional_project, :only => [:issue_growth_graph]
     before_filter :find_open_issues, :only => [:old_issues, :issue_age_graph]
     
     helper IssuesHelper
