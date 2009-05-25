@@ -1,0 +1,8 @@
+nl:
+  label_graphs: Grafieken
+  label_graphs_total_vs_closed_issues: Alle issues vs. Gesloten issues
+  label_graphs_old_issues: Openstaande 'overtijd' issues
+  label_graphs_issue_growth: Alle issues over een periode
+  label_graphs_issue_status_flow: Recente status wijzigingen (binnen 24 uur)
+  label_graphs_assigned_to_status_flow: Recent gewijzigd toewijzigen (binnen 24 uur)
+  warning_no_issues: Er zijn geen issues om grafieken mee te maken.
