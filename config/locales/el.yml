@@ -1,0 +1,8 @@
+en:
+  label_graphs: Γραφήματα
+  label_graphs_total_vs_closed_issues: Όλα τα θέματα vs. Κλειστά θέματα
+  label_graphs_old_issues: Ανοιχτά θέματα που παλαιώνουν
+  label_graphs_issue_growth: Όλα τα θέματα στο πέρασμα του χρόνου
+  label_graphs_issue_status_flow: Πρόσφατες αλλαγές κατάστασης (τελευταίες 24 ώρες)
+  label_graphs_assigned_to_status_flow: Πρόσφατες αλλαγές ανάθεσης (τελευταίες 24 ώρες)
+  warning_no_issues: Δεν υπάρχουν θέματα για απεικόνιση.
