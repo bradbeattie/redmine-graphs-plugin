@@ -1,0 +1,9 @@
+zh:
+  label_graphs: '图'
+  label_graphs_total_vs_closed_issues: '全部问题 vs. 已关闭的问题'
+  label_graphs_old_issues: Open aging issues
+  label_graphs_issue_growth: '问题总时间'
+  label_graphs_issue_status_flow: '最近24小时内的状态改变'
+  label_graphs_assigned_to_status_flow: '最近24小时内的分配状态'
+  warning_no_issues: '没有问题'
+  
