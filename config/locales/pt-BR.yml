@@ -1,0 +1,8 @@
+"pt-BR":
+  label_graphs: Gráficos
+  label_graphs_total_vs_closed_issues: Total de tarefas vs. Tarefas fechadas
+  label_graphs_old_issues: Tarefas antigas abertas
+  label_graphs_issue_growth: Total de tarefas ao longo do tempo
+  label_graphs_issue_status_flow: Status alterados recentemente (dentro de 24 horas)
+  label_graphs_assigned_to_status_flow: Atribuidas recentementes (dentro de 24 horas)
+  warning_no_issues: Não há tarefas para o gráfico.
