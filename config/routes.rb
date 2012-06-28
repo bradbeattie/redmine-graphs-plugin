@@ -8,4 +8,6 @@ ActionController::Routing::Routes.draw do |map|
   map.connect 'graphs/recent-status-changes', :controller=>"graphs", :action=>"recent_status_changes_graph"
   map.connect 'graphs/recent-assigned-to-changes', :controller=>"graphs", :action=>"recent_assigned_to_changes_graph"
   map.connect 'graphs/target-version/:id', :controller=>"graphs", :action=>"target_version_graph" 
+  map.connect 'graphs/old_issues', :controller => 'graphs', :action => 'issue_age_graph'
+  map.connect 'graphs/issue_growth', :controller => 'graphs', :action => 'issue_growth_graph'
 end
