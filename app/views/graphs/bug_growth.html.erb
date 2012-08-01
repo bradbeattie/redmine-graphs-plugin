@@ -1,0 +1,11 @@
+<h2><%= l(:label_graphs_bug_growth) %></h2>
+<% unless @bugs.empty? %>
+    <%= tag("embed", :width => "100%", :height => 300, :type => "image/svg+xml", :src => url_for(:controller => 'graphs', :action => 'bug_growth_graph')) if @project.nil? %>
+    <%= tag("embed", :width => "100%", :height => 300, :type => "image/svg+xml", :src => url_for(:controller => 'graphs', :action => 'bug_growth_graph', :project_id => @project.id)) unless @project.nil? %>
+<% else %>
+    <%= render :partial => 'issues/list_simple', :locals => { :issues => @issues } %>
+<% end %>
+
+<% content_for :sidebar do %>
+    <%= render :partial => 'issues/sidebar' %>
+<% end %>
