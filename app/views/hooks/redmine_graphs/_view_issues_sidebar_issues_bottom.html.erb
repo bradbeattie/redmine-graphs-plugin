@@ -1,0 +1,17 @@
+<% if project.nil? %>
+  <h3><%= l(:label_graphs)%></h3>
+  <%= link_to(l(:label_graphs_old_issues), {:controller => 'graphs', :action => 'old_issues'}) %>
+  <br/>
+  <%= link_to(l(:label_graphs_issue_growth), {:controller => 'graphs', :action => 'issue_growth'}) %>
+  <br/>
+  <%= link_to(l(:label_graphs_bug_growth), {:controller => 'graphs', :action => 'bug_growth'}) %>
+  <br/>
+<% else %>
+  <h3><%= l(:label_graphs)%></h3>
+  <%= link_to(l(:label_graphs_old_issues), {:controller => 'graphs', :action => 'old_issues', :project_id => project}) %>
+  <br/>
+  <%= link_to(l(:label_graphs_issue_growth), {:controller => 'graphs', :action => 'issue_growth', :project_id => project}) %>
+  <br/>
+  <%= link_to(l(:label_graphs_bug_growth), {:controller => 'graphs', :action => 'bug_growth', :project_id => project}) %>
+  <br/>
+<% end %>
