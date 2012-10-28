@@ -13,7 +13,7 @@ class GraphsController < ApplicationController
     before_filter :confirm_issues_exist, :only => [:issue_growth]
     before_filter :find_optional_project, :only => [:issue_growth_graph]
     before_filter :find_open_issues, :only => [:old_issues, :issue_age_graph]
-    before_filter :find_bug_issues, :only => [:bug_growth, :bug_growth_graph]
+    before_filter :find_bug_issues, :only => [:issue_growth, :bug_growth, :bug_growth_graph]
 	
     helper IssuesHelper
     
@@ -26,12 +26,12 @@ class GraphsController < ApplicationController
         sql = " select u1.id as old_user, u2.id as new_user, count(*) as changes_count"
         sql << " from journals as j"
         sql << " left join journal_details as jd on j.id = jd.journal_id"
-        sql << " left join users as u1 on jd.old_value = u1.id"
-        sql << " left join users as u2 on jd.value = u2.id"
-        sql << " where journalized_type = 'issue' and prop_key = 'assigned_to_id' and  DATE_SUB(CURRENT_TIMESTAMP, INTERVAL 1 DAY) <= j.created_on"
+        sql << " left join users as u1 on cast(jd.old_value AS integer) = u1.id"
+        sql << " left join users as u2 on cast(jd.value AS integer) = u2.id"
+        sql << " where journalized_type = 'issue' and prop_key = 'assigned_to_id' and CURRENT_TIMESTAMP - INTERVAL '1 DAY' <= j.created_on"
         sql << " and (u1.id = #{User.current.id} or u2.id = #{User.current.id})"
         sql << " and u1.id <> 0 and u2.id <> 0"
-        sql << " group by old_value, value"
+        sql << " group by u1.id, u2.id"
         @assigned_to_changes = ActiveRecord::Base.connection.select_all(sql)
         user_ids = @assigned_to_changes.collect { |change| [change["old_user"].to_i, change["new_user"].to_i] }.flatten.uniq
         user_ids.delete(User.current.id)
@@ -46,10 +46,10 @@ class GraphsController < ApplicationController
         sql = " select is1.id as old_status, is2.id as new_status, count(*) as changes_count"
         sql << " from journals as j"
         sql << " left join journal_details as jd on j.id = jd.journal_id"
-        sql << " left join issue_statuses as is1 on jd.old_value = is1.id"
-        sql << " left join issue_statuses as is2 on jd.value = is2.id"
-        sql << " where journalized_type = 'issue' and prop_key = 'status_id' and  DATE_SUB(CURRENT_TIMESTAMP, INTERVAL 1 DAY) <= created_on"
-        sql << " group by old_value, value"
+        sql << " left join issue_statuses as is1 on cast(jd.old_value AS integer) = is1.id"
+        sql << " left join issue_statuses as is2 on cast(jd.value AS integer) = is2.id"
+        sql << " where journalized_type = 'issue' and prop_key = 'status_id' and  CURRENT_TIMESTAMP - INTERVAL '1 DAY' <= created_on"
+        sql << " group by is1.id, is2.id"
         sql << " order by is1.position, is2.position"
         @status_changes = ActiveRecord::Base.connection.select_all(sql)
         @issue_statuses = IssueStatus.find(:all).sort { |a,b| a.position<=>b.position }
@@ -117,7 +117,8 @@ class GraphsController < ApplicationController
         sql << " FROM #{Issue.table_name}"
         sql << " WHERE project_id IN (%s)" % top_projects.compact.join(',')
         sql << " GROUP BY project_id, date"
-        issue_counts = ActiveRecord::Base.connection.select_all(sql).group_by { |c| c["project_id"] }
+		issue_counts = 0
+        issue_counts = ActiveRecord::Base.connection.select_all(sql).group_by { |c| c["project_id"] } unless top_projects.compact.empty?
 
         # Generate the created_on lines
         top_projects.each do |project_id|
