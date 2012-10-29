@@ -108,16 +108,25 @@ class GraphsController < ApplicationController
             sql << "    OR project_id IN (%s)" % @project.descendants.active.visible.collect { |p| p.id }.join(',') unless @project.descendants.active.visible.empty?
             sql << " )"
         end 
+        unless User.current.admin?
+            sql << " AND (#{Issue.table_name}.is_private = #{connection.quoted_false} OR "
+            sql << "(#{Project.allowed_to_condition(User.current, :view_private_issues)}))"
+        end
         sql << " GROUP BY project_id"
         sql << " ORDER BY issue_count DESC"
         sql << " LIMIT 6"
         top_projects = ActiveRecord::Base.connection.select_all(sql).collect { |p| p["project_id"] }
         
+        # Get the issues created per project, per day
         sql = "SELECT project_id, date(#{Issue.table_name}.created_on) as date, COUNT(*) as issue_count"
         sql << " FROM #{Issue.table_name}"
+        sql << " LEFT JOIN #{Project.table_name} ON #{Issue.table_name}.project_id = #{Project.table_name}.id"
         sql << " WHERE project_id IN (%s)" % top_projects.compact.join(',')
+        unless User.current.admin?
+            sql << " AND (#{Issue.table_name}.is_private = #{connection.quoted_false} OR "
+            sql << "(#{Project.allowed_to_condition(User.current, :view_private_issues)}))"
+        end
         sql << " GROUP BY project_id, date"
-		issue_counts = 0
         issue_counts = ActiveRecord::Base.connection.select_all(sql).group_by { |c| c["project_id"] } unless top_projects.compact.empty?
 
         # Generate the created_on lines
@@ -133,6 +142,10 @@ class GraphsController < ApplicationController
                 :title => Project.find(project_id).to_s
             })
         end
+        graph.add_data(
+          :data => [ Date.today.to_s, 0 , (Date.today + 60).to_s, 0 ], 
+          :title => Project.find(@project.id).to_s
+        ) if top_projects.compact.empty?
         
         # Compile the graph
         headers["Content-Type"] = "image/svg+xml"
