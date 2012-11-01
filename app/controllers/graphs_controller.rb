@@ -22,16 +22,17 @@ class GraphsController < ApplicationController
     ############################################################################
     # Displays a ring of issue assignement changes around the current user
     def recent_assigned_to_changes_graph
+        yesterday = (Time.now - 1.day).strftime('%Y-%m-%d %H:%M:%S')
         # Get the top visible projects by issue count
         sql = " select u1.id as old_user, u2.id as new_user, count(*) as changes_count"
         sql << " from journals as j"
         sql << " left join journal_details as jd on j.id = jd.journal_id"
-        sql << " left join users as u1 on cast(jd.old_value AS integer) = u1.id"
-        sql << " left join users as u2 on cast(jd.value AS integer) = u2.id"
-        sql << " where journalized_type = 'issue' and prop_key = 'assigned_to_id' and CURRENT_TIMESTAMP - INTERVAL '1 DAY' <= j.created_on"
+        sql << " left join users as u1 on cast(jd.old_value AS decimal) = u1.id"
+        sql << " left join users as u2 on cast(jd.value AS decimal) = u2.id"
+        sql << " where journalized_type = 'issue' and prop_key = 'assigned_to_id' and timestamp '#{yesterday}' <= j.created_on"
         sql << " and (u1.id = #{User.current.id} or u2.id = #{User.current.id})"
         sql << " and u1.id <> 0 and u2.id <> 0"
-        sql << " group by u1.id, u2.id"
+        sql << " group by old_user, new_user"
         @assigned_to_changes = ActiveRecord::Base.connection.select_all(sql)
         user_ids = @assigned_to_changes.collect { |change| [change["old_user"].to_i, change["new_user"].to_i] }.flatten.uniq
         user_ids.delete(User.current.id)
@@ -42,14 +43,15 @@ class GraphsController < ApplicationController
     
     # Displays a ring of issue status changes
     def recent_status_changes_graph
+        yesterday = (Time.now - 1.day).strftime('%Y-%m-%d %H:%M:%S')
         # Get the top visible projects by issue count
         sql = " select is1.id as old_status, is2.id as new_status, count(*) as changes_count"
         sql << " from journals as j"
         sql << " left join journal_details as jd on j.id = jd.journal_id"
-        sql << " left join issue_statuses as is1 on cast(jd.old_value AS integer) = is1.id"
-        sql << " left join issue_statuses as is2 on cast(jd.value AS integer) = is2.id"
-        sql << " where journalized_type = 'issue' and prop_key = 'status_id' and  CURRENT_TIMESTAMP - INTERVAL '1 DAY' <= created_on"
-        sql << " group by is1.id, is2.id"
+        sql << " left join issue_statuses as is1 on cast(jd.old_value AS decimal) = is1.id"
+        sql << " left join issue_statuses as is2 on cast(jd.value AS decimal) = is2.id"
+        sql << " where journalized_type = 'issue' and prop_key = 'status_id' and  timestamp '#{yesterday}' <= created_on"
+        sql << " group by old_status, new_status"
         sql << " order by is1.position, is2.position"
         @status_changes = ActiveRecord::Base.connection.select_all(sql)
         @issue_statuses = IssueStatus.find(:all).sort { |a,b| a.position<=>b.position }
