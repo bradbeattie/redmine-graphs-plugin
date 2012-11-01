@@ -82,24 +82,26 @@ class GraphsController < ApplicationController
     ############################################################################
     # Displays projects by total issues over time
     def issue_growth_graph
-    
-        # Initialize the graph
-        graph = SVG::Graph::TimeSeries.new({
-            :area_fill => true,
-            :height => 300,
-            :min_y_value => 0,
-            :no_css => true,
-            :show_x_guidelines => true,
-            :scale_x_integers => true,
-            :scale_y_integers => true,
-            :show_data_points => false,
-            :show_data_values => false,
-            :stagger_x_labels => true,
-            :style_sheet => "/plugin_assets/redmine_graphs/stylesheets/issue_growth.css",
-            :width => 720,
-            :x_label_format => "%Y-%m-%d"
-        })
-        
+      top_projects = nil; issue_counts = nil;
+      
+      # Initialize the graph
+      graph = SVG::Graph::TimeSeries.new({
+          :area_fill => true,
+          :height => 300,
+          :min_y_value => 0,
+          :no_css => true,
+          :show_x_guidelines => true,
+          :scale_x_integers => true,
+          :scale_y_integers => true,
+          :show_data_points => false,
+          :show_data_values => false,
+          :stagger_x_labels => true,
+          :style_sheet => "/plugin_assets/redmine_graphs/stylesheets/issue_growth.css",
+          :width => 720,
+          :x_label_format => "%Y-%m-%d"
+      })
+
+      ActiveRecord::Base.connection_pool.with_connection do |conn|
         # Get the top visible projects by issue count
         sql = "SELECT project_id, COUNT(*) as issue_count"
         sql << " FROM #{Issue.table_name}"
@@ -111,13 +113,13 @@ class GraphsController < ApplicationController
             sql << " )"
         end 
         unless User.current.admin?
-            sql << " AND (#{Issue.table_name}.is_private = #{connection.quoted_false} OR "
+            sql << " AND (#{Issue.table_name}.is_private = #{conn.quoted_false} OR "
             sql << "(#{Project.allowed_to_condition(User.current, :view_private_issues)}))"
         end
         sql << " GROUP BY project_id"
         sql << " ORDER BY issue_count DESC"
         sql << " LIMIT 6"
-        top_projects = ActiveRecord::Base.connection.select_all(sql).collect { |p| p["project_id"] }
+        top_projects = conn.select_all(sql).collect { |p| p["project_id"] }
         
         # Get the issues created per project, per day
         sql = "SELECT project_id, date(#{Issue.table_name}.created_on) as date, COUNT(*) as issue_count"
@@ -125,33 +127,34 @@ class GraphsController < ApplicationController
         sql << " LEFT JOIN #{Project.table_name} ON #{Issue.table_name}.project_id = #{Project.table_name}.id"
         sql << " WHERE project_id IN (%s)" % top_projects.compact.join(',')
         unless User.current.admin?
-            sql << " AND (#{Issue.table_name}.is_private = #{connection.quoted_false} OR "
+            sql << " AND (#{Issue.table_name}.is_private = #{conn.quoted_false} OR "
             sql << "(#{Project.allowed_to_condition(User.current, :view_private_issues)}))"
         end
         sql << " GROUP BY project_id, date"
-        issue_counts = ActiveRecord::Base.connection.select_all(sql).group_by { |c| c["project_id"] } unless top_projects.compact.empty?
-
-        # Generate the created_on lines
-        top_projects.each do |project_id|
-            counts = Array(issue_counts[project_id])
-            created_count = 0
-            created_on_line = Hash.new
-            created_on_line[(Date.parse( Array(counts).first["date"].to_s )-1).to_s] = 0
-            counts.each { |count| created_count += count["issue_count"].to_i; created_on_line[count["date"].to_s] = created_count }
-            created_on_line[Date.today.to_s] = created_count
-            graph.add_data({
-                :data =>  Array(created_on_line).sort.flatten,
-                :title => Project.find(project_id).to_s
-            })
-        end
-        graph.add_data(
-          :data => [ Date.today.to_s, 0 , (Date.today + 60).to_s, 0 ], 
-          :title => Project.find(@project.id).to_s
-        ) if top_projects.compact.empty?
-        
-        # Compile the graph
-        headers["Content-Type"] = "image/svg+xml"
-        send_data(graph.burn, :type => "image/svg+xml", :disposition => "inline")
+        issue_counts = conn.select_all(sql).group_by { |c| c["project_id"] } unless top_projects.compact.empty?
+      end
+      
+      # Generate the created_on lines
+      top_projects.each do |project_id|
+          counts = Array(issue_counts[project_id])
+          created_count = 0
+          created_on_line = Hash.new
+          created_on_line[(Date.parse( Array(counts).first["date"].to_s )-1).to_s] = 0
+          counts.each { |count| created_count += count["issue_count"].to_i; created_on_line[count["date"].to_s] = created_count }
+          created_on_line[Date.today.to_s] = created_count
+          graph.add_data({
+              :data =>  Array(created_on_line).sort.flatten,
+              :title => Project.find(project_id).to_s
+          })
+      end
+      graph.add_data(
+        :data => [ Date.today.to_s, 0 , (Date.today + 60).to_s, 0 ], 
+        :title => Project.find(@project.id).to_s
+      ) if top_projects.compact.empty?
+      
+      # Compile the graph
+      headers["Content-Type"] = "image/svg+xml"
+      send_data(graph.burn, :type => "image/svg+xml", :disposition => "inline")
     end
 
     # Displays issues by creation date, cumulatively
