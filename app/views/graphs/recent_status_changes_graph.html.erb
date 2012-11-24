@@ -61,10 +61,10 @@
         </polygon>
     <% end %>
   </g>
-  <g fill="#EEEEEE" stroke="black" stroke-width="1" stroke-opacity="0.75">
+  <g stroke="black" stroke-width="1" stroke-opacity="0.75">
     <% points.each do |status_id, point| %>
         <a target="_top" xlink:href="/issues?set_filter=1&amp;f[]=status_id&amp;op[status_id]==&amp;v[status_id][]=<%= status_id %>&amp;f[]=updated_on&amp;op[updated_on]=>t-&amp;v[updated_on][]=1&amp;f[]=&amp;c[]=tracker&amp;c[]=subject&amp;c[]=assigned_to&amp;c[]=fixed_version&amp;group_by=project">
-            <circle cx="<%= point["x"] %>" cy="<%= point["y"] %>" r="35" />
+            <circle fill="#EEEEEE" cx="<%= point["x"] %>" cy="<%= point["y"] %>" r="35" />
         </a>
     <% end %>
   </g>
