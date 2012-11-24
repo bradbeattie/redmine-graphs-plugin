@@ -22,7 +22,7 @@ class GraphsController < ApplicationController
     ############################################################################
     # Displays a ring of issue assignement changes around the current user
     def recent_assigned_to_changes_graph
-        yesterday = (Time.now - 1.day).strftime('%Y-%m-%d %H:%M:%S')
+        yesterday = (Time.now - 7.day).strftime('%Y-%m-%d %H:%M:%S')
         # Get the top visible projects by issue count
         sql = " select u1.id as old_user, u2.id as new_user, count(*) as changes_count"
         sql << " from journals as j"
@@ -43,7 +43,7 @@ class GraphsController < ApplicationController
     
     # Displays a ring of issue status changes
     def recent_status_changes_graph
-        yesterday = (Time.now - 1.day).strftime('%Y-%m-%d %H:%M:%S')
+        yesterday = (Time.now - 7.day).strftime('%Y-%m-%d %H:%M:%S')
         # Get the top visible projects by issue count
         sql = " select is1.id as old_status, is2.id as new_status, count(*) as changes_count"
         sql << " from journals as j"

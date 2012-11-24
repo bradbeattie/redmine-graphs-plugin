@@ -3,7 +3,7 @@ zh:
   label_graphs_total_vs_closed_issues: "所有问题和已关闭问题的对比"
   label_graphs_old_issues: "开启状态下的旧问题"
   label_graphs_issue_growth: "所有超时的问题"
-  label_graphs_issue_status_flow: "最近更新的问题（24小时内）"
-  label_graphs_assigned_to_status_flow: "最近重新指派的问题（24小时内）"
+  label_graphs_issue_status_flow: "最近更新的问题（168小时内）"
+  label_graphs_assigned_to_status_flow: "最近重新指派的问题（168小时内）"
   warning_no_issues: "没有任何可创建图表的问题"
   

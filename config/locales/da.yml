@@ -5,6 +5,6 @@ da:
   label_graphs_issue_growth: Totale antal sager over tid
   label_graphs_bug_growth: Totale antal bugs over tid
   label_graphs_closed_bugs: Lukket
-  label_graphs_issue_status_flow: Seneste statusændringer (inden for 24 timer) 
-  label_graphs_assigned_to_status_flow: Seneste tildelingsændringer (inden for 24 timer)
+  label_graphs_issue_status_flow: Seneste statusændringer (inden for 168 timer) 
+  label_graphs_assigned_to_status_flow: Seneste tildelingsændringer (inden for 168 timer)
   warning_no_issues: Der er ingen sager til grafen.

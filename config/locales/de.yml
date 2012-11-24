@@ -3,4 +3,4 @@ de:
   label_graphs_total_vs_closed_issues: Total Tickets vs. geschlossene Tickets
   label_graphs_old_issues: Offene alternde Tickets
   label_graphs_issue_growth: Total Tickets
-  label_graphs_issue_status_flow: Statusänderungen (letzte 24 Stunden)
+  label_graphs_issue_status_flow: Statusänderungen (letzte 168 Stunden)
