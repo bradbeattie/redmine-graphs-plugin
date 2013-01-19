@@ -3,4 +3,8 @@ de:
   label_graphs_total_vs_closed_issues: Total Tickets vs. geschlossene Tickets
   label_graphs_old_issues: Offene alternde Tickets
   label_graphs_issue_growth: Total Tickets
-  label_graphs_issue_status_flow: Statusänderungen (letzte 168 Stunden)
+  label_graphs_bug_growth: Total Fehler
+  label_graphs_closed_bugs: Geschlossen
+  label_graphs_issue_status_flow: Statusänderungen der letzten 7 Tage
+  label_graphs_assigned_to_status_flow: Zuweisungsänderungen der letzten 7 Tage
+  warning_no_issues: Keine Tickets vorhanden.
