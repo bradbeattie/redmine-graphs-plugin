@@ -1,0 +1,10 @@
+ja:
+  label_graphs: グラフ
+  label_graphs_total_vs_closed_issues: すべてのチケット vs. 終了したチケット
+  label_graphs_old_issues: 古いチケット
+  label_graphs_issue_growth: すべてのチケット
+  label_graphs_bug_growth: すべてのバグ
+  label_graphs_closed_bugs: 終了済み
+  label_graphs_issue_status_flow: 最近のステータスの更新 (直近7日間)
+  label_graphs_assigned_to_status_flow: 最近のアサインの更新 (直近7日間)
+  warning_no_issues: グラフにできるチケットはありません。
