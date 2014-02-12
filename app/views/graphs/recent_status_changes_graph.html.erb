@@ -3,34 +3,32 @@
 
 <%
     issue_statuses_by_id = @issue_statuses.index_by { |issue_status| issue_status.id }
-
+    
     points = Hash.new
     i = -1
     @issue_statuses.each do |issue_status|
         points[issue_status.id] = {
-            "x" => Math.sin(2*Math::PI*i/@issue_statuses.size)*160 + 205,
-            "y" => Math.cos(2*Math::PI*i/@issue_statuses.size)*160 + 205
+            "x" => Math.sin(2*Math::PI*i/@issue_statuses.size)*100 + 140,
+            "y" => Math.cos(2*Math::PI*i/@issue_statuses.size)*100 + 140
         }
         i -= 1
     end
 %>
-<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.0" width="410" height="410">
+
+<svg xmlns="http://www.w3.org/2000/svg" version="1.0" width="280" height="280">
   <g fill-opacity="0.2" stroke-opacity="0.5">
     <% @status_changes.each do |status_change| %>
         <%
-            changes_count = [status_change["changes_count"].to_i/2,35].min
+            changes_count = [status_change["changes_count"].to_i*3,35].min
             old_status = status_change["old_status"].to_i
             new_status = status_change["new_status"].to_i
-            if points.include?(old_status) == false or points.include?(new_status) == false
-                next
-            end
-
+            
             x1 = points[old_status]["x"]
             y1 = points[old_status]["y"]
-
+            
             x2 = points[new_status]["x"]
             y2 = points[new_status]["y"]
-
+            
             atan2 = -Math.atan2(y1-y2,x1-x2)
             xdiff = Math.sin(atan2)*changes_count
             ydiff = Math.cos(atan2)*changes_count
@@ -43,36 +41,17 @@
                 <%= x2-xdiff/5 %>,<%= y2-ydiff/5 %>"
             fill="<%= issue_statuses_by_id[old_status].position > issue_statuses_by_id[new_status].position ? "red" : "green" %>"
             stroke="<%= issue_statuses_by_id[old_status].position > issue_statuses_by_id[new_status].position ? "red" : "green" %>"
-        >
-            <%
-                data = ActiveRecord::Base.connection.select_all("
-                    select j.journalized_id as id from journals as j
-                    left join journal_details as jd on j.id = jd.journal_id
-                    left join issue_statuses as is1 on jd.old_value = is1.id
-                    left join issue_statuses as is2 on jd.value = is2.id
-                    where journalized_type = 'issue'
-                    and prop_key = 'status_id'
-                    and DATE_SUB(CURRENT_TIMESTAMP, INTERVAL 7 DAY) <= created_on
-                    and is1.id = #{status_change['old_status']}
-                    and is2.id = #{status_change['new_status']}
-                ")
-            %>
-            <title><%= data.collect { |d| d['id'] }.sort.join(", ") %></title>
-        </polygon>
+        />
     <% end %>
   </g>
-  <g stroke="black" stroke-width="1" stroke-opacity="0.75">
+  <g fill="#EEEEEE" stroke="black" stroke-width="1" stroke-opacity="0.75">
     <% points.each do |status_id, point| %>
-        <a target="_top" xlink:href="/issues?set_filter=1&amp;f[]=status_id&amp;op[status_id]==&amp;v[status_id][]=<%= status_id %>&amp;f[]=updated_on&amp;op[updated_on]=>t-&amp;v[updated_on][]=1&amp;f[]=&amp;c[]=tracker&amp;c[]=subject&amp;c[]=assigned_to&amp;c[]=fixed_version&amp;group_by=project">
-            <circle fill="#EEEEEE" cx="<%= point["x"] %>" cy="<%= point["y"] %>" r="35" />
-        </a>
+        <circle cx="<%= point["x"] %>" cy="<%= point["y"] %>" r="35" />
     <% end %>
   </g>
   <g font-family="Helvetica, Arial" font-size="12" text-anchor="middle">
     <% points.each do |status_id, point| %>
-        <a target="_top" xlink:href="/issues?set_filter=1&amp;f[]=status_id&amp;op[status_id]==&amp;v[status_id][]=<%= status_id %>&amp;f[]=updated_on&amp;op[updated_on]=>t-&amp;v[updated_on][]=1&amp;f[]=&amp;c[]=tracker&amp;c[]=subject&amp;c[]=assigned_to&amp;c[]=fixed_version&amp;group_by=project">
-            <text x="<%= point["x"] %>" y="<%= point["y"] + 3 %>"><%= issue_statuses_by_id[status_id] %></text>
-        </a>
+        <text x="<%= point["x"] %>" y="<%= point["y"] + 3 %>"><%= issue_statuses_by_id[status_id] %></text>
     <% end %>
   </g>
 </svg>

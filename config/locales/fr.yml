@@ -3,8 +3,4 @@ fr:
   label_graphs_total_vs_closed_issues: Fermetures / Total
   label_graphs_old_issues: Age des demandes
   label_graphs_issue_growth: Total des demandes
-  label_graphs_bug_growth: Total des anomalies
-  label_graphs_closed_bugs: Fermé
-  label_graphs_issue_status_flow: Changements récents (dans les derniers 7 jours)
-  label_graphs_assigned_to_status_flow: Changements récents de statut (dans les derniers 7 jours)
-  warning_no_issues: Pas de demandes à afficher.
+  label_graphs_issue_status_flow: Changements récents (dans les dernières 24 heures)

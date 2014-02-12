@@ -8,4 +8,11 @@ Redmine::Plugin.register :redmine_graphs do
   author 'Brad Beattie'
   description 'This plugin provides instances of Redmine with additional graphs.'
   version '0.1.0'
+  settings({
+     :partial => 'graphs/settings',
+     :default => {
+      'graph_width' => "1280",
+      'graph_height' => "720"
+      }
+  })
 end

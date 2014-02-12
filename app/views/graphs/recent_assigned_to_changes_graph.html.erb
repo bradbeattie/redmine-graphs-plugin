@@ -3,31 +3,31 @@
 
 <%
     points = Hash.new
-    points[User.current.id] = { "x" => 205, "y" => 205 }
+    points[User.current.id] = { "x" => 140, "y" => 140 }
     i = -1
     @users.each do |user_id, user|
         points[user_id] = {
-            "x" => Math.sin(2*Math::PI*i/@users.size)*130 + 205,
-            "y" => Math.cos(2*Math::PI*i/@users.size)*130 + 205
+            "x" => Math.sin(2*Math::PI*i/@users.size)*100 + 140,
+            "y" => Math.cos(2*Math::PI*i/@users.size)*100 + 140
         }
         i -= 1
     end unless @users.nil?
 %>
 
-<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.0" width="410" height="410">
+<svg xmlns="http://www.w3.org/2000/svg" version="1.0" width="280" height="280">
   <g fill-opacity="0.2" stroke-opacity="0.5">
     <% @assigned_to_changes.each do |assigned_to_change| %>
         <%
-            changes_count = [assigned_to_change["changes_count"].to_i*3,45].min
+            changes_count = [assigned_to_change["changes_count"].to_i*3,35].min
             old_user = assigned_to_change["old_user"].to_i
             new_user = assigned_to_change["new_user"].to_i
-
+            
             x1 = points[old_user]["x"]
             y1 = points[old_user]["y"]
-
+            
             x2 = points[new_user]["x"]
             y2 = points[new_user]["y"]
-
+            
             atan2 = -Math.atan2(y1-y2,x1-x2)
             xdiff = Math.sin(atan2)*changes_count
             ydiff = Math.cos(atan2)*changes_count
@@ -43,18 +43,14 @@
         />
     <% end %>
   </g>
-  <g stroke="black" stroke-width="1" stroke-opacity="0.75">
+  <g fill="#EEEEEE" stroke="black" stroke-width="1" stroke-opacity="0.75">
     <% points.each do |user_id, point| %>
-        <a target="_top" xlink:href="/issues?set_filter=1&amp;f[]=assigned_to_id&amp;op[assigned_to_id]==&amp;v[assigned_to_id][]=<%= user_id %>&amp;f[]=updated_on&amp;op[updated_on]=>t-&amp;v[updated_on][]=1&amp;f[]=&amp;c[]=tracker&amp;c[]=status&amp;c[]=subject&amp;c[]=fixed_version&amp;group_by=project">
-            <circle fill="#EEEEEE" cx="<%= point["x"] %>" cy="<%= point["y"] %>" r="45" />
-        </a>
+        <circle cx="<%= point["x"] %>" cy="<%= point["y"] %>" r="35" />
     <% end %>
   </g>
   <g font-family="Helvetica, Arial" font-size="12" text-anchor="middle">
     <% points.each do |user_id, point| %>
-        <a target="_top" xlink:href="/issues?set_filter=1&amp;f[]=assigned_to_id&amp;op[assigned_to_id]==&amp;v[assigned_to_id][]=<%= user_id %>&amp;f[]=updated_on&amp;op[updated_on]=>t-&amp;v[updated_on][]=1&amp;f[]=&amp;c[]=tracker&amp;c[]=status&amp;c[]=subject&amp;c[]=fixed_version&amp;group_by=project">
-            <text x="<%= point["x"] %>" y="<%= point["y"] + 3 %>"><%= user_id == User.current.id ? User.current : @users[user_id] %></text>
-        </a>
+        <text x="<%= point["x"] %>" y="<%= point["y"] + 3 %>"><%= user_id == User.current.id ? User.current : @users[user_id] %></text>
     <% end %>
   </g>
 </svg>
