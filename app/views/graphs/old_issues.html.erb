@@ -1,7 +1,7 @@
 <h2><%= l(:label_graphs_old_issues) %></h2>
 <% unless @issues_by_created_on.empty? %>
-    <%= tag("embed", :width => "100%", :height => 300, :type => "image/svg+xml", :src => url_for(:controller => 'graphs', :action => 'issue_age_graph')) if @project.nil? %>
-    <%= tag("embed", :width => "100%", :height => 300, :type => "image/svg+xml", :src => url_for(:controller => 'graphs', :action => 'issue_age_graph', :project_id => @project.id)) unless @project.nil? %>
+    <%= tag("embed", :width => "100%", :height => Integer(Setting.plugin_redmine_graphs['graph_height']), :type => "image/svg+xml", :src => url_for(:controller => 'graphs', :action => 'issue_age_graph')) if @project.nil? %>
+    <%= tag("embed", :width => "100%", :height => Integer(Setting.plugin_redmine_graphs['graph_height']), :type => "image/svg+xml", :src => url_for(:controller => 'graphs', :action => 'issue_age_graph', :project_id => @project.id)) unless @project.nil? %>
 <% end %>
 
 <div class="splitcontentleft">

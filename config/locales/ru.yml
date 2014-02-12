@@ -3,7 +3,7 @@ ru:
   label_graphs_total_vs_closed_issues: Всего задач/Закрытые задачи
   label_graphs_old_issues: Открытые устаревающие задания
   label_graphs_issue_growth: Всего задач
-  label_graphs_issue_status_flow: Последние изменения статуса (за 168 часа)
-  label_graphs_assigned_to_status_flow: Последние смены назначеных (за 168 часа)
+  label_graphs_issue_status_flow: Последние изменения статуса (за 24 часа)
+  label_graphs_assigned_to_status_flow: Последние смены назначеных (за 24 часа)
   warning_no_issues: Нет задач для отображения в графиках.
   

@@ -1,9 +1,9 @@
 cs:
   label_graphs: Grafy
   label_graphs_total_vs_closed_issues: Celkový počet úkolů a uzavřených úkolů
-  label_graphs_old_issues: Otevřené zastaralé úkoly
+  label_graphs_old_issues: Otevřít zastaralé úkoly
   label_graphs_issue_growth: Všechny úkoly od počátku
-  label_graphs_issue_status_flow: Nedávno změněné stavy (během 168 hodin)
-  label_graphs_assigned_to_status_flow: Nedávno změněné přidělení (během 168 hodin)
+  label_graphs_issue_status_flow: Nedávno změněné stavy (během 24 hodin)
+  label_graphs_assigned_to_status_flow: Nedávno změněné přidělení (během 24 hodin)
   warning_no_issues: Nejsou zde žádné úkoly.
   
