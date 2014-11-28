@@ -54,7 +54,7 @@ class GraphsController < ApplicationController
         sql << " group by old_status, new_status"
         sql << " order by is1.position, is2.position"
         @status_changes = ActiveRecord::Base.connection.select_all(sql)
-        @issue_statuses = IssueStatus.find(:all).sort { |a,b| a.position<=>b.position }
+        @issue_statuses = IssueStatus.all.sort { |a,b| a.position<=>b.position }
         headers["Content-Type"] = "image/svg+xml"
         render :layout => false
     end
@@ -329,9 +329,9 @@ class GraphsController < ApplicationController
         if !@project.nil?
             ids = [@project.id]
             ids += @project.descendants.active.visible.collect(&:id)
-            @issues = Issue.visible.find(:first, :conditions => ["#{Project.table_name}.id IN (?)", ids])
+            @issues = Issue.visible.where(["#{Project.table_name}.id IN (?)", ids]).first
         else
-            @issues = Issue.visible.find(:first)
+            @issues = Issue.visible.first
         end
     rescue ActiveRecord::RecordNotFound
         render_404
@@ -342,22 +342,22 @@ class GraphsController < ApplicationController
         if !@project.nil?
             ids = [@project.id]
             ids += @project.descendants.active.visible.collect(&:id)
-            @issues = Issue.visible.find(:all, :include => [:status], :conditions => ["#{IssueStatus.table_name}.is_closed=? AND #{Project.table_name}.id IN (?)", false, ids])
+            @issues = Issue.visible.includes(:status).where("#{IssueStatus.table_name}.is_closed=? AND #{Project.table_name}.id IN (?)", false, ids)
         else
-            @issues = Issue.visible.find(:all, :include => [:status], :conditions => ["#{IssueStatus.table_name}.is_closed=?", false])
+            @issues = Issue.visible.includes(:status).where("#{IssueStatus.table_name}.is_closed=?", false)
         end
     rescue ActiveRecord::RecordNotFound
         render_404
     end
 	
-	def find_bug_issues
+    def find_bug_issues
         find_optional_project
         if !@project.nil?
             ids = [@project.id]
             ids += @project.descendants.active.visible.collect(&:id)
-            @bugs= Issue.visible.find(:all, :include => [:status], :conditions => ["#{Issue.table_name}.tracker_id IN (?) AND #{Project.table_name}.id IN (?)", 1, ids])
+            @bugs = Issue.visible.includes(:status).where("#{Issue.table_name}.tracker_id IN (?) AND #{Project.table_name}.id IN (?)", 1, ids).to_a
         else
-            @bugs= Issue.visible.find(:all, :include => [:status], :conditions => ["#{Issue.table_name}.tracker_id IN (?)", 1])
+            @bugs = Issue.visible.includes(:status).where("#{Issue.table_name}.tracker_id IN (?)", 1).to_a
         end
     rescue ActiveRecord::RecordNotFound
         render_404
