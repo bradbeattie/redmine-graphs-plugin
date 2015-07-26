@@ -1,9 +1,11 @@
 tr:
   label_graphs: Grafikler
-  label_graphs_total_vs_closed_issues: Toplam sorunlar / Kapatılmış sorunlar
-  label_graphs_old_issues: Uzun süredir açık sorunlar
-  label_graphs_issue_growth: Toplam gelişen sorunlar
-  label_graphs_issue_status_flow: 168 saat içindeki son durum değişiklikleri
-  label_graphs_assigned_to_status_flow: 168 saat içindeki son atama değişiklikleri
-  warning_no_issues: Veritabanında grafik çizmek için sorun bulunamadı.
+  label_graphs_total_vs_closed_issues: Toplam işler / Kapatılmış işler
+  label_graphs_old_issues: Uzun süredir açık işler
+  label_graphs_issue_growth: Zamana göre toplam işler
+  label_graphs_bug_growth: Zamana göre hatalar
+  label_graphs_closed_bugs: Kapalı
+  label_graphs_issue_status_flow: Son değişiklikler (7 gün öncesine kadar)
+  label_graphs_assigned_to_status_flow: Son atamalar (7 gün öncesine kadar)
+  warning_no_issues: Çizilecek iş bulunamadı.
   
