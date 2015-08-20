@@ -342,9 +342,9 @@ class GraphsController < ApplicationController
         if !@project.nil?
             ids = [@project.id]
             ids += @project.descendants.active.visible.collect(&:id)
-            @issues = Issue.visible.includes(:status).where("#{IssueStatus.table_name}.is_closed=? AND #{Project.table_name}.id IN (?)", false, ids)
+            @issues = Issue.visible.joins(:status).where("#{IssueStatus.table_name}.is_closed = ? AND #{Project.table_name}.id IN (?)", false, ids)
         else
-            @issues = Issue.visible.includes(:status).where("#{IssueStatus.table_name}.is_closed=?", false)
+            @issues = Issue.visible.joins(:status).where("#{IssueStatus.table_name}.is_closed = ?", false)
         end
     rescue ActiveRecord::RecordNotFound
         render_404
@@ -355,9 +355,9 @@ class GraphsController < ApplicationController
         if !@project.nil?
             ids = [@project.id]
             ids += @project.descendants.active.visible.collect(&:id)
-            @bugs = Issue.visible.includes(:status).where("#{Issue.table_name}.tracker_id IN (?) AND #{Project.table_name}.id IN (?)", 1, ids).to_a
+            @bugs = Issue.visible.joins(:status).where("#{Issue.table_name}.tracker_id IN (?) AND #{Project.table_name}.id IN (?)", 1, ids).to_a
         else
-            @bugs = Issue.visible.includes(:status).where("#{Issue.table_name}.tracker_id IN (?)", 1).to_a
+            @bugs = Issue.visible.joins(:status).where("#{Issue.table_name}.tracker_id IN (?)", 1).to_a
         end
     rescue ActiveRecord::RecordNotFound
         render_404
