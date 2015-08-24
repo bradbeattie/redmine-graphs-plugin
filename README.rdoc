@@ -11,8 +11,7 @@ Only tested on Redmine 2.0.3 and Ruby 1.9.3.
 NOTE: Redmine 2.0.3 has compatibility issue with Ruby 1.9.x. Please see {Defect #11290: ParseDate missing in Ruby 1.9x - Redmine}[http://www.redmine.org/issues/11290].
 
   $ cd /path/to/redmine/plugins
-  $ git clone git://github.com/dmp/redmine-graphs-plugin.git redmine_graphs
+  $ git clone git://github.com/bradbeattie/redmine-graphs-plugin.git redmine_graphs
   $ rake redmine:plugins:migrate RAILS_ENV=production 
 
 Then restart redmine.
-
