@@ -16,6 +16,7 @@ class GraphsController < ApplicationController
     before_filter :find_bug_issues, :only => [:issue_growth, :bug_growth, :bug_growth_graph]
 	
     helper IssuesHelper
+    helper QueriesHelper
     
     ############################################################################
     # My Page block graphs
