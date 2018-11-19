@@ -9,11 +9,11 @@ class GraphsController < ApplicationController
     
     menu_item :issues, :only => [:issue_growth, :old_issues, :bug_growth]
 
-    before_filter :find_version, :only => [:target_version_graph]
-    before_filter :confirm_issues_exist, :only => [:issue_growth]
-    before_filter :find_optional_project, :only => [:issue_growth_graph]
-    before_filter :find_open_issues, :only => [:old_issues, :issue_age_graph]
-    before_filter :find_bug_issues, :only => [:issue_growth, :bug_growth, :bug_growth_graph]
+    before_action :find_version, :only => [:target_version_graph]
+    before_action :confirm_issues_exist, :only => [:issue_growth]
+    before_action :find_optional_project, :only => [:issue_growth_graph]
+    before_action :find_open_issues, :only => [:old_issues, :issue_age_graph]
+    before_action :find_bug_issues, :only => [:issue_growth, :bug_growth, :bug_growth_graph]
 	
     helper IssuesHelper
     helper QueriesHelper
@@ -37,7 +37,7 @@ class GraphsController < ApplicationController
         @assigned_to_changes = ActiveRecord::Base.connection.select_all(sql)
         user_ids = @assigned_to_changes.collect { |change| [change["old_user"].to_i, change["new_user"].to_i] }.flatten.uniq
         user_ids.delete(User.current.id)
-        @users = User.find(:all, :conditions => "id IN ("+user_ids.join(',')+")").index_by { |user| user.id } unless user_ids.empty?
+        @users = User.where(id: user_ids).to_a.index_by { |user| user.id } unless user_ids.empty?
         headers["Content-Type"] = "image/svg+xml"
         render :layout => false
     end
