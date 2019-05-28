@@ -50,15 +50,15 @@ module SVG
     #   print graph.burn()
     #
     # = Description
-    # 
+    #
     # Produces a graph of temporal scalar data.
-    # 
+    #
     # = Examples
     #
     # http://www.germane-software/repositories/public/SVG/test/timeseries.rb
-    # 
+    #
     # = Notes
-    # 
+    #
     # The default stylesheet handles upto 10 data sets, if you
     # use more you must create your own stylesheet and add the
     # additional settings for the extra data sets. You will know
@@ -68,18 +68,18 @@ module SVG
     # Unlike the other types of charts, data sets must contain x,y pairs:
     #
     #   [ "12:30", 2 ]          # A data set with 1 point: ("12:30",2)
-    #   [ "01:00",2, "14:20",6] # A data set with 2 points: ("01:00",2) and 
-    #                           #                           ("14:20",6)  
+    #   [ "01:00",2, "14:20",6] # A data set with 2 points: ("01:00",2) and
+    #                           #                           ("14:20",6)
     #
-    # Note that multiple data sets within the same chart can differ in length, 
+    # Note that multiple data sets within the same chart can differ in length,
     # and that the data in the datasets needn't be in order; they will be ordered
     # by the plot along the X-axis.
-    # 
-    # The dates must be parseable by ParseDate, but otherwise can be
+    #
+    # The dates must be parseable by Date.parse, but otherwise can be
     # any order of magnitude (seconds within the hour, or years)
-    # 
+    #
     # = See also
-    # 
+    #
     # * SVG::Graph::Graph
     # * SVG::Graph::BarHorizontal
     # * SVG::Graph::Bar
@@ -112,9 +112,9 @@ module SVG
       # See Time::strformat
       attr_accessor :x_label_format
       # Use this to set the spacing between dates on the axis.  The value
-      # must be of the form 
+      # must be of the form
       # "\d+ ?(days|weeks|months|years|hours|minutes|seconds)?"
-      # 
+      #
       # EG:
       #
       #   graph.timescale_divisions = "2 weeks"
@@ -128,9 +128,9 @@ module SVG
       # Add data to the plot.
       #
       #   d1 = [ "12:30", 2 ]          # A data set with 1 point: ("12:30",2)
-      #   d2 = [ "01:00",2, "14:20",6] # A data set with 2 points: ("01:00",2) and 
-      #                                #                           ("14:20",6)  
-      #   graph.add_data( 
+      #   d2 = [ "01:00",2, "14:20",6] # A data set with 2 points: ("01:00",2) and
+      #                                #                           ("14:20",6)
+      #   graph.add_data(
       #     :data => d1,
       #     :title => 'One'
       #   )
@@ -140,10 +140,10 @@ module SVG
       #   )
       #
       # Note that the data must be in time,value pairs, and that the date format
-      # may be any date that is parseable by ParseDate.
+      # may be any date that is parseable by Date.parse.
       def add_data data
         @data = [] unless @data
-       
+
         raise "No data provided by #{@data.inspect}" unless data[:data] and
                                                     data[:data].kind_of? Array
         raise "Data supplied must be x,y pairs!  "+
@@ -182,7 +182,7 @@ module SVG
       def get_x_labels
         get_x_values.collect { |v| Time.at(v).strftime( x_label_format ) }
       end
-      
+
       private
       def get_x_values
         rv = []
